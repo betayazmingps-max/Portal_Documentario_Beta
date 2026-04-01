@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal Proveedores — Complejo Agroindustrial Beta</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --p:   #5212A0;
+  --p2:  #6B28C0;
+  --p3:  #8B4DD8;
+  --pl:  #EDE5FF;
+  --pll: #F8F4FF;
+  --g:   #5BAD1E;
+  --g2:  #79CC38;
+  --gl:  #EBF7DC;
+  --gll: #F5FBF0;
+  --w:   #FFFFFF;
+  --bg:  #F4F1FA;
+  --s1:  #1C0840;
+  --s2:  #5C4880;
+  --s3:  #9B89B8;
+  --s4:  #D4CBE8;
+  --s5:  #EDE8F8;
+  --r:   #E02020;
+  --rl:  #FEE8E8;
+  --f:   'Outfit', sans-serif;
+  --m:   'JetBrains Mono', monospace;
+  --r8:  8px;
+  --r12: 12px;
+  --r16: 16px;
+  --r24: 24px;
+  --shadow: 0 1px 3px rgba(82,18,160,.06), 0 4px 16px rgba(82,18,160,.08);
+}
+
+body{font-family:var(--f);background:var(--bg);color:var(--s1);min-height:100vh}
+
+/* ══ NAVBAR ══════════════════════════════ */
+nav{
+  background:var(--p);
+  border-bottom:2px solid var(--g);
+  height:60px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2rem;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 16px rgba(82,18,160,.3);
+}
+.nav-logo{display:flex;align-items:center}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-pill{
+  font-size:11px;font-weight:600;letter-spacing:.06em;
+  padding:4px 12px;border-radius:999px;
+  background:rgba(91,173,30,.2);color:#b4f06e;
+  border:1px solid rgba(91,173,30,.35);
+}
+.nav-pill-p{background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.2)}
+
+/* ══ HERO ════════════════════════════════ */
+.hero{
+  background:var(--p);
+  position:relative;overflow:hidden;
+  padding:3.5rem 2rem 0;
+}
+/* Forma diagonal verde abajo */
+.hero-wave{
+  height:60px;
+  background:var(--bg);
+  clip-path:polygon(0 100%, 100% 0, 100% 100%);
+  position:relative;z-index:2;
+}
+.hero-wave::before{
+  content:'';position:absolute;inset:0;
+  background:var(--g);
+  clip-path:polygon(0 100%, 100% 30%, 100% 100%);
+  opacity:.35;
+}
+/* Círculos decorativos */
+.hero-dec1{
+  position:absolute;top:-80px;right:-80px;
+  width:340px;height:340px;border-radius:50%;
+  background:radial-gradient(circle, rgba(107,40,192,.6) 0%, transparent 70%);
+  pointer-events:none;
+}
+.hero-dec2{
+  position:absolute;bottom:20px;left:-60px;
+  width:200px;height:200px;border-radius:50%;
+  background:rgba(91,173,30,.12);
+  pointer-events:none;
+}
+/* Línea verde lateral derecha */
+.hero-accent{
+  position:absolute;top:0;right:0;
+  width:5px;height:100%;
+  background:linear-gradient(to bottom, var(--g2), var(--g));
+}
+
+.hero-content{
+  position:relative;z-index:2;
+  max-width:680px;margin:0 auto;
+  display:grid;grid-template-columns:1fr auto;
+  align-items:center;gap:2rem;
+  padding-bottom:1.5rem;
+}
+.hero-text h1{
+  font-size:2rem;font-weight:800;
+  color:var(--w);line-height:1.15;
+  margin-bottom:.5rem;letter-spacing:-.02em;
+}
+.hero-text h1 span{color:var(--g2)}
+.hero-text p{
+  font-size:.875rem;color:rgba(255,255,255,.7);
+  line-height:1.6;max-width:380px;
+}
+.hero-chips{display:flex;gap:6px;margin-top:1rem;flex-wrap:wrap}
+.hchip{
+  font-size:10.5px;font-weight:600;letter-spacing:.05em;
+  padding:3px 10px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.2);
+  color:rgba(255,255,255,.8);background:rgba(255,255,255,.1);
+}
+.hchip.g{background:rgba(91,173,30,.25);border-color:rgba(91,173,30,.5);color:#b4f06e}
+
+/* Logo en el hero */
+.hero-logo-box{
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:var(--r16);
+  padding:1rem 1.25rem;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  backdrop-filter:blur(4px);
+  flex-shrink:0;
+}
+.hero-logo-box img{height:44px;width:auto;filter:brightness(0) invert(1)}
+.hero-logo-box .gbar{
+  height:3px;width:80%;border-radius:99px;
+  background:linear-gradient(90deg, var(--g2), transparent);
+}
+
+/* ══ PROGRESS ════════════════════════════ */
+.prog-bar{
+  background:var(--w);
+  border-bottom:1px solid var(--s4);
+}
+.prog-inner{
+  max-width:720px;margin:0 auto;
+  padding:.875rem 2rem;
+  display:flex;align-items:center;gap:12px;
+}
+.prog-label{font-size:11.5px;font-weight:600;color:var(--s2);white-space:nowrap}
+.prog-track{flex:1;height:5px;border-radius:99px;background:var(--s4);overflow:hidden}
+.prog-fill{
+  height:100%;border-radius:99px;
+  background:linear-gradient(90deg, var(--p), var(--g));
+  width:0%;transition:width .4s cubic-bezier(.4,0,.2,1);
+}
+.prog-num{
+  font-size:11px;font-weight:600;
+  font-family:var(--m);color:var(--p);white-space:nowrap;
+}
+
+/* ══ WRAPPER ═════════════════════════════ */
+.wrap{
+  max-width:720px;margin:0 auto;
+  padding:2rem 1.5rem 5rem;
+  display:flex;flex-direction:column;gap:1.5rem;
+}
+
+/* ══ STEP LABEL ══════════════════════════ */
+.step-label{
+  display:flex;align-items:center;gap:10px;
+  font-size:11px;font-weight:700;letter-spacing:.12em;
+  color:var(--s3);text-transform:uppercase;
+}
+.step-num{
+  width:22px;height:22px;border-radius:50%;
+  background:var(--p);color:var(--w);
+  font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.step-line{flex:1;height:1px;background:var(--s4)}
+
+/* ══ CARD ════════════════════════════════ */
+.card{
+  background:var(--w);
+  border:1px solid var(--s4);
+  border-radius:var(--r16);
+  padding:1.5rem;
+  box-shadow:var(--shadow);
+  transition:border-color .15s, box-shadow .15s;
+}
+.card:focus-within{
+  border-color:var(--p3);
+  box-shadow:var(--shadow), 0 0 0 3px rgba(82,18,160,.07);
+}
+.card-title{
+  font-size:13px;font-weight:700;color:var(--s1);
+  margin-bottom:1.1rem;
+  display:flex;align-items:center;gap:7px;
+}
+.card-title svg{width:15px;height:15px;color:var(--p);flex-shrink:0}
+.card-title .dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--g);flex-shrink:0;
+}
+
+/* ══ FORM ════════════════════════════════ */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:.875rem}
+@media(max-width:500px){.g2{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:.3rem}
+
+label{font-size:11.5px;font-weight:600;color:var(--s2);letter-spacing:.01em}
+label .req{color:var(--p);margin-left:2px}
+
+input,select,textarea{
+  font-family:var(--f);font-size:13.5px;color:var(--s1);
+  background:var(--pll);
+  border:1.5px solid var(--s4);
+  border-radius:var(--r8);
+  padding:.55rem .875rem;
+  outline:none;
+  transition:border-color .15s, box-shadow .15s, background .15s;
+  width:100%;appearance:none;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--p);
+  background:var(--w);
+  box-shadow:0 0 0 3px rgba(82,18,160,.09);
+}
+input::placeholder,textarea::placeholder{color:var(--s3);font-size:13px}
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%235C4880' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 11px center;padding-right:2rem;cursor:pointer;
+}
+option{background:var(--w)}
+
+/* ══ TABS ════════════════════════════════ */
+.tabs{
+  display:flex;gap:3px;
+  background:var(--s5);
+  border:1px solid var(--s4);
+  border-radius:var(--r12);
+  padding:3px;margin-bottom:1.25rem;
+}
+.tab{
+  flex:1;padding:7px 6px;text-align:center;
+  font-size:12px;font-weight:600;font-family:var(--f);
+  border-radius:10px;border:none;background:transparent;
+  color:var(--s2);cursor:pointer;transition:all .15s;
+}
+.tab.active{
+  background:var(--p);color:var(--w);
+  box-shadow:0 2px 8px rgba(82,18,160,.3);
+}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ══ DOC GRID ════════════════════════════ */
+.doc-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(170px, 1fr));
+  gap:8px;
+}
+.doc-item{
+  position:relative;
+  border:1.5px solid var(--s4);
+  border-radius:var(--r12);
+  overflow:hidden;cursor:pointer;
+  background:var(--pll);
+  transition:all .15s;
+}
+.doc-item:hover{border-color:var(--p3);box-shadow:0 3px 12px rgba(82,18,160,.12)}
+.doc-item.has-file{border-color:var(--g);background:var(--gll)}
+.doc-item.required-missing{border-color:var(--r);background:var(--rl)}
+.doc-item input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.doc-face{padding:12px 12px 10px;pointer-events:none}
+.doc-icon{
+  width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:8px;
+  background:var(--w);border:1px solid var(--s4);
+  color:var(--p);transition:all .15s;
+}
+.doc-item.has-file .doc-icon{background:var(--g);border-color:transparent;color:var(--w)}
+.doc-item.required-missing .doc-icon{background:var(--r);border-color:transparent;color:var(--w)}
+.doc-name{font-size:11.5px;font-weight:600;color:var(--s1);line-height:1.35;margin-bottom:3px}
+.doc-item.has-file .doc-name{color:var(--g)}
+.doc-status{font-size:10px;font-family:var(--m);color:var(--s3)}
+.doc-item.has-file .doc-status{color:var(--g)}
+.doc-item.required-missing .doc-status{color:var(--r)}
+.doc-req-tag{
+  position:absolute;top:7px;right:7px;
+  font-size:9px;font-family:var(--m);font-weight:500;
+  padding:2px 6px;border-radius:999px;
+  background:rgba(82,18,160,.1);color:var(--p);
+}
+
+/* ══ INFO CARD ═══════════════════════════ */
+.info-card{
+  background:linear-gradient(135deg, var(--pl) 0%, var(--gll) 100%);
+  border:1px solid var(--s4);
+  border-left:4px solid var(--p);
+  border-radius:var(--r12);
+  padding:1rem 1.25rem;
+  display:flex;gap:14px;align-items:center;
+}
+.info-icon{
+  width:40px;height:40px;flex-shrink:0;border-radius:10px;
+  background:var(--p);color:var(--w);
+  display:flex;align-items:center;justify-content:center;
+}
+.info-icon svg{width:18px;height:18px}
+.info-text p{font-size:13px;font-weight:700;color:var(--p);margin-bottom:2px}
+.info-text span{font-size:11.5px;color:var(--s2)}
+
+/* ══ SUBMIT ══════════════════════════════ */
+.btn-wrap{display:flex;flex-direction:column;gap:.75rem}
+.btn-submit{
+  width:100%;padding:.95rem 1.5rem;
+  background:linear-gradient(135deg, var(--p) 0%, var(--p2) 100%);
+  border:none;border-radius:var(--r12);
+  font-family:var(--f);font-size:15px;font-weight:700;
+  color:var(--w);cursor:pointer;
+  box-shadow:0 4px 16px rgba(82,18,160,.35);
+  transition:all .15s;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  letter-spacing:-.01em;
+}
+.btn-submit:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 24px rgba(82,18,160,.4);
+  background:linear-gradient(135deg, var(--p2) 0%, var(--p3) 100%);
+}
+.btn-submit:active{transform:scale(.99)}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-submit svg{width:17px;height:17px;flex-shrink:0}
+
+/* ══ ALERT ═══════════════════════════════ */
+.alert{
+  display:none;padding:.9rem 1.1rem;
+  border-radius:var(--r12);border:1.5px solid;
+  font-size:13px;line-height:1.55;
+}
+.alert.success{display:flex;gap:10px;align-items:flex-start;background:var(--gl);border-color:var(--g);color:#2d6010}
+.alert.error  {display:flex;gap:10px;align-items:flex-start;background:var(--rl);border-color:var(--r);color:var(--r)}
+.alert.loading{display:flex;gap:10px;align-items:center;background:var(--pl);border-color:var(--p);color:var(--p)}
+.spin{width:15px;height:15px;flex-shrink:0;border:2px solid rgba(82,18,160,.2);border-top-color:var(--p);border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ══ FOOTER ══════════════════════════════ */
+footer{
+  background:var(--s1);
+  padding:1.75rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:1rem;
+}
+.footer-logo{display:flex;align-items:center}
+.footer-text{font-size:11px;color:rgba(255,255,255,.4);text-align:right}
+.footer-text strong{color:rgba(255,255,255,.7)}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-logo">
+    <div style="display:flex;flex-direction:column;line-height:1;gap:2px;">
+  <span style="font-family:'Outfit',sans-serif;font-size:26px;font-weight:800;letter-spacing:-.03em;color:#fff;">bet<span style="color:#79CC38;">a</span></span>
+  <span style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:500;letter-spacing:.08em;color:rgba(255,255,255,.6);text-transform:lowercase;">complejo agroindustrial</span>
+</div>
+  </div>
+  <div class="nav-right">
+    <span class="nav-pill-p nav-pill">Portal Proveedores</span>
+    <span class="nav-pill">Sistema Activo</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-dec1"></div>
+  <div class="hero-dec2"></div>
+  <div class="hero-accent"></div>
+
+  <div class="hero-content">
+    <div class="hero-text">
+      <h1>Portal de<br><span>Documentos</span></h1>
+      <p>Sube los documentos requeridos para tu habilitación como proveedor de transporte — <strong style="color:#b4f06e">Complejo Agroindustrial Beta</strong></p>
+      <div class="hero-chips">
+        <span class="hchip">Sin registro</span>
+        <span class="hchip">Archivos seguros</span>
+        <span class="hchip g">Beta Activo</span>
+      </div>
+    </div>
+    <div class="hero-logo-box">
+      <div style="display:flex;flex-direction:column;align-items:center;line-height:1;gap:3px;">
+  <span style="font-family:'Outfit',sans-serif;font-size:32px;font-weight:800;letter-spacing:-.03em;color:#fff;">bet<span style="color:#79CC38;">a</span></span>
+  <span style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:500;letter-spacing:.08em;color:rgba(255,255,255,.65);text-transform:lowercase;">complejo agroindustrial</span>
+</div>
+      <div class="gbar"></div>
+    </div>
+  </div>
+
+  <div class="hero-wave"></div>
+</div>
+
+<!-- PROGRESS -->
+<div class="prog-bar">
+  <div class="prog-inner">
+    <span class="prog-label">Progreso de carga</span>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+    <span class="prog-num" id="prog-count">0 / 0</span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="wrap">
+
+  <!-- Info strip -->
+  <div class="info-card">
+    <div class="info-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/>
+        <path d="M14 14h.01M14 17h3M17 14v3M20 17v3M20 20h-3"/>
+      </svg>
+    </div>
+    <div class="info-text">
+      <p>Comparte este portal por QR o enlace directo</p>
+      <span>El proveedor abre desde su celular — sin instalar nada, sin necesitar cuenta</span>
+    </div>
+  </div>
+
+  <!-- PASO 1 -->
+  <div class="step-label">
+    <div class="step-num">1</div>
+    <span>Identificación</span>
+    <div class="step-line"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+      Datos del proveedor
+      <div class="dot"></div>
+    </div>
+    <div class="g2" style="margin-bottom:.875rem">
+      <div class="field">
+        <label>Nombre del proveedor <span class="req">*</span></label>
+        <input type="text" id="proveedor" placeholder="Ej: COLMOS S.A.C.">
+      </div>
+      <div class="field">
+        <label>RUC</label>
+        <input type="text" id="ruc" placeholder="20612307599" maxlength="11">
+      </div>
+    </div>
+    <div class="g2" style="margin-bottom:.875rem">
+      <div class="field">
+        <label>Analista responsable <span class="req">*</span></label>
+        <select id="analista">
+          <option value="">Seleccionar...</option>
+          <option>JESUS</option>
+          <option>ODAR</option>
+          <option>REGALADO</option>
+          <option>WILBER</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Correo de confirmación</label>
+        <input type="email" id="email" placeholder="proveedor@empresa.com">
+      </div>
+    </div>
+    <div class="field">
+      <label>Contacto / representante legal</label>
+      <input type="text" id="contacto" placeholder="Nombre completo del representante">
+    </div>
+  </div>
+
+  <!-- PASO 2 -->
+  <div class="step-label">
+    <div class="step-num">2</div>
+    <span>Documentos requeridos</span>
+    <div class="step-line"></div>
+  </div>
+
+  <div class="card" style="padding:1.25rem">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('proveedor-docs',this)">Empresa / Proveedor</button>
+      <button class="tab" onclick="switchTab('conductor-docs',this)">Conductor</button>
+      <button class="tab" onclick="switchTab('unidad-docs',this)">Unidad</button>
+    </div>
+
+    <div class="tab-panel active" id="proveedor-docs">
+      <div class="doc-grid" id="grid-proveedor"></div>
+    </div>
+    <div class="tab-panel" id="conductor-docs">
+      <div id="conductores-lista"></div>
+      <button onclick="addConductor()" style="
+        margin-top:10px;width:100%;padding:9px;
+        background:var(--pll);border:1.5px dashed var(--p3);
+        border-radius:var(--r12);cursor:pointer;
+        font-family:var(--f);font-size:13px;font-weight:600;
+        color:var(--p);display:flex;align-items:center;justify-content:center;gap:7px;
+        transition:all .15s;
+      " onmouseover="this.style.background='var(--pl)'" onmouseout="this.style.background='var(--pll)'">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Agregar otro conductor
+      </button>
+    </div>
+    <div class="tab-panel" id="unidad-docs">
+      <div id="unidades-lista"></div>
+      <button onclick="addUnidad()" style="
+        margin-top:10px;width:100%;padding:9px;
+        background:var(--pll);border:1.5px dashed var(--p3);
+        border-radius:var(--r12);cursor:pointer;
+        font-family:var(--f);font-size:13px;font-weight:600;
+        color:var(--p);display:flex;align-items:center;justify-content:center;gap:7px;
+        transition:all .15s;
+      " onmouseover="this.style.background='var(--pl)'" onmouseout="this.style.background='var(--pll)'">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Agregar otra unidad
+      </button>
+    </div>
+  </div>
+
+  <!-- PASO 3 -->
+  <div class="step-label">
+    <div class="step-num">3</div>
+    <span>Observaciones</span>
+    <div class="step-line"></div>
+  </div>
+
+  <div class="card">
+    <div class="field">
+      <label>Comentario adicional (opcional)</label>
+      <textarea id="obs" rows="3" placeholder="Ej: SOAT en trámite, adjunto constancia de pago..."></textarea>
+    </div>
+  </div>
+
+  <!-- SUBMIT -->
+  <div class="btn-wrap">
+    <button class="btn-submit" id="btn-submit" onclick="submitForm()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+      Enviar documentos — Complejo Agroindustrial Beta
+    </button>
+    <div class="alert" id="alert-box"></div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">
+    <div style="display:flex;flex-direction:column;line-height:1;gap:2px;">
+  <span style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:800;letter-spacing:-.03em;color:#fff;">bet<span style="color:#79CC38;">a</span></span>
+  <span style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:500;letter-spacing:.08em;color:rgba(255,255,255,.45);text-transform:lowercase;">complejo agroindustrial</span>
+</div>
+  </div>
+  <div class="footer-text">
+    <strong>Complejo Agroindustrial Beta</strong><br>
+    Portal de Documentos de Proveedores<br>
+    <span style="font-size:10px;color:rgba(255,255,255,.3);margin-top:4px;display:inline-block;">Desarrollado por Ing. Yazmin Atuncar</span>
+  </div>
+</footer>
+
+<script>
+
+
+const DOCS={
+  proveedor:[
+    {id:'p01',name:'Contrato firmado',req:true},{id:'p02',name:'Ficha RUC',req:true},
+    {id:'p03',name:'Reporte Sentinel',req:true},{id:'p04',name:'Referencias comerciales',req:false},
+    {id:'p05',name:'Vigencia poder / DNI rep. legal',req:true},{id:'p06',name:'Brochure / carta presentación',req:false},
+    {id:'p07',name:'Lista Clinton',req:true},{id:'p08',name:'Carta conflictos de interés',req:true},
+    {id:'p09',name:'Carta de vinculación',req:true},{id:'p10',name:'Compromiso capacitación',req:true},
+    {id:'p11',name:'Compromiso control BUS',req:false},{id:'p12',name:'Deuda coactiva',req:true},
+    {id:'p13',name:'Carta compromiso tributario',req:true},{id:'p14',name:'Cotización',req:false},
+    {id:'p15',name:'Carta descanso transportista',req:false},{id:'p16',name:'Carta ETI',req:false},
+    {id:'p17',name:'Carta LAFT',req:false},
+  ],
+  conductor:[
+    {id:'c01',name:'DNI conductor',req:true},{id:'c02',name:'Licencia de conducir',req:true},
+    {id:'c03',name:'Récord MTC',req:true},{id:'c04',name:'SCTR — Seguro complementario',req:true},
+    {id:'c05',name:'Contrato de conductores',req:true},{id:'c06',name:'Antecedentes penales',req:true},
+    {id:'c07',name:'Antecedentes policiales',req:true},{id:'c08',name:'Antecedentes judiciales',req:true},
+    {id:'c09',name:'Foto del conductor',req:false},
+  ],
+  unidad:[
+    {id:'u01',name:'Tarjeta de propiedad',req:true},{id:'u02',name:'SOAT vigente',req:true},
+    {id:'u03',name:'Revisión técnica (RTV)',req:true},{id:'u04',name:'Tarjeta de circulación',req:true},
+    {id:'u05',name:'Póliza Beta / seguro',req:false},{id:'u06',name:'Boletín informativo',req:false},
+    {id:'u07',name:'Foto exterior unidad',req:false},{id:'u08',name:'Foto interior unidad',req:false},
+  ]
+};
+
+const files={};
+
+const ICON=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>`;
+const CHECK=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+function buildGrid(cat,cid){
+  const el=document.getElementById(cid);
+  el.innerHTML='';
+  DOCS[cat].forEach(doc=>{
+    const d=document.createElement('div');
+    d.className='doc-item'; d.id='item-'+doc.id;
+    d.innerHTML=`
+      <input type="file" accept=".pdf,.jpg,.jpeg,.png,.docx" onchange="pick('${doc.id}',this)" title="${doc.name}">
+      <div class="doc-face">
+        <div class="doc-icon" id="icon-${doc.id}">${ICON}</div>
+        <div class="doc-name">${doc.name}</div>
+        <div class="doc-status" id="st-${doc.id}">Sin archivo</div>
+      </div>
+      ${doc.req?'<span class="doc-req-tag">obligatorio</span>':''}`;
+    el.appendChild(d);
+  });
+}
+buildGrid('proveedor','grid-proveedor');
+
+// ── Multi conductor / unidad ──────────────────
+let condCount = 0;
+let unidCount = 0;
+
+function makeEntry(type, idx, docs) {
+  const prefix = type === 'cond' ? 'c' : 'u';
+  const labelField = type === 'cond'
+    ? `<label>DNI / Nombre del conductor #${idx}</label>
+       <input type="text" id="${type}-nombre-${idx}" placeholder="Ej: SANDOVAL SUCLUPE ELMER — 42444013"
+         style="font-family:var(--f);font-size:13.5px;color:var(--s1);background:var(--pll);border:1.5px solid var(--s4);border-radius:var(--r8);padding:.55rem .875rem;width:100%;outline:none;margin-bottom:.875rem;">`
+    : `<label>Placa de la unidad #${idx}</label>
+       <input type="text" id="${type}-placa-${idx}" placeholder="Ej: M4M966" style="text-transform:uppercase;font-family:var(--f);font-size:13.5px;color:var(--s1);background:var(--pll);border:1.5px solid var(--s4);border-radius:var(--r8);padding:.55rem .875rem;width:100%;outline:none;margin-bottom:.875rem;">`;
+
+  const div = document.createElement('div');
+  div.id = `${type}-entry-${idx}`;
+  div.style.cssText = 'background:var(--pll);border:1px solid var(--s4);border-radius:var(--r12);padding:1rem;margin-bottom:.75rem;position:relative;';
+  div.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;">
+      <span style="font-size:11px;font-weight:700;color:var(--p);letter-spacing:.06em;text-transform:uppercase;">
+        ${type === 'cond' ? 'Conductor' : 'Unidad'} #${idx}
+      </span>
+      ${idx > 1 ? `<button onclick="removeEntry('${type}','${idx}')" style="background:none;border:none;cursor:pointer;color:var(--s3);font-size:11px;font-family:var(--f);font-weight:600;padding:2px 8px;border-radius:6px;border:1px solid var(--s4);">✕ Quitar</button>` : ''}
+    </div>
+    <div class="field">${labelField}</div>
+    <div class="doc-grid" id="grid-${type}-${idx}" style="grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:7px;"></div>
+  `;
+  return div;
+}
+
+function buildEntryGrid(type, idx) {
+  const cat = type === 'cond' ? 'conductor' : 'unidad';
+  const container = document.getElementById(`grid-${type}-${idx}`);
+  if (!container) return;
+  container.innerHTML = '';
+  DOCS[cat].forEach(doc => {
+    const uid = `${type}${idx}_${doc.id}`;
+    const d = document.createElement('div');
+    d.className = 'doc-item'; d.id = 'item-' + uid;
+    d.innerHTML = `
+      <input type="file" accept=".pdf,.jpg,.jpeg,.png,.docx" onchange="pick('${uid}',this)" title="${doc.name}">
+      <div class="doc-face">
+        <div class="doc-icon" id="icon-${uid}">${ICON}</div>
+        <div class="doc-name">${doc.name}</div>
+        <div class="doc-status" id="st-${uid}">Sin archivo</div>
+      </div>
+      ${doc.req ? '<span class="doc-req-tag">obligatorio</span>' : ''}`;
+    container.appendChild(d);
+  });
+}
+
+function addConductor() {
+  condCount++;
+  const lista = document.getElementById('conductores-lista');
+  lista.appendChild(makeEntry('cond', condCount, DOCS.conductor));
+  buildEntryGrid('cond', condCount);
+  updateProg();
+}
+
+function addUnidad() {
+  unidCount++;
+  const lista = document.getElementById('unidades-lista');
+  lista.appendChild(makeEntry('unid', unidCount, DOCS.unidad));
+  buildEntryGrid('unid', unidCount);
+  updateProg();
+}
+
+function removeEntry(type, idx) {
+  const el = document.getElementById(`${type}-entry-${idx}`);
+  if (el) {
+    // Remove files from this entry
+    Object.keys(files).filter(k => k.startsWith(`${type}${idx}_`)).forEach(k => delete files[k]);
+    el.remove();
+    updateProg();
+  }
+}
+
+// Init: one conductor, one unidad by default
+addConductor();
+addUnidad();
+
+function pick(id,inp){
+  const f=inp.files[0]; if(!f) return;
+  files[id]=f;
+  document.getElementById('item-'+id).classList.add('has-file');
+  document.getElementById('item-'+id).classList.remove('required-missing');
+  document.getElementById('icon-'+id).innerHTML=CHECK;
+  const n=f.name.length>22?f.name.slice(0,19)+'...':f.name;
+  document.getElementById('st-'+id).textContent=n;
+  updateProg();
+}
+
+function updateProg(){
+  const all=[...DOCS.proveedor,...DOCS.conductor,...DOCS.unidad];
+  const done=Object.keys(files).length, total=all.length;
+  document.getElementById('prog-count').textContent=done+' / '+total;
+  document.getElementById('prog-fill').style.width=(done/total*100)+'%';
+}
+updateProg();
+
+function switchTab(pid,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById(pid).classList.add('active');
+  btn.classList.add('active');
+}
+
+function validate(){
+  const prov=document.getElementById('proveedor').value.trim();
+  const ana=document.getElementById('analista').value;
+  if(!prov){showAlert('error','Ingresa el nombre del proveedor.');return false;}
+  if(!ana){showAlert('error','Selecciona el analista responsable.');return false;}
+  const miss=DOCS.proveedor.filter(d=>d.req&&!files[d.id]);
+  if(miss.length){
+    miss.forEach(d=>document.getElementById('item-'+d.id).classList.add('required-missing'));
+    document.querySelectorAll('.tab')[0].click();
+    showAlert('error','Faltan '+miss.length+' documento(s) obligatorio(s): '+miss.map(d=>d.name).slice(0,3).join(', ')+(miss.length>3?'...':'')+'.');
+    return false;
+  }
+  return true;
+}
+
+/* ══════════════════════════════════════════════════════
+   CONFIGURACIÓN POWER AUTOMATE
+   1. En Power Automate crea un flujo "Cuando se recibe
+      una solicitud HTTP"
+   2. Pega la URL del trigger en FLOW_URL abajo
+   3. Configura el flujo para guardar en SharePoint
+      (ver instrucciones en el README adjunto)
+══════════════════════════════════════════════════════ */
+const FLOW_URL = 'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/211f4b80b9df4cb89b5773de8ad441e3/triggers/manual/paths/invoke?api-version=1';
+
+async function submitForm(){
+  if(!validate()) return;
+  const btn=document.getElementById('btn-submit');
+  btn.disabled=true;
+
+  const prov    = document.getElementById('proveedor').value.trim();
+  const ana     = document.getElementById('analista').value;
+  const ruc     = document.getElementById('ruc').value.trim();
+  const email   = document.getElementById('email').value.trim();
+  const contacto= document.getElementById('contacto').value.trim();
+  const obs     = document.getElementById('obs').value.trim();
+  const fecha   = new Date().toISOString().slice(0,10);
+
+  if(FLOW_URL.includes('PEGA-AQUI')){
+    await demo(prov,ana,Object.keys(files).length);
+    return;
+  }
+
+  try{
+    showAlert('loading','Preparando envío...');
+    let enviados=0;
+    const total=Object.keys(files).length;
+
+    // Enviar cada archivo al flujo de Power Automate
+    for(const[fileKey,file] of Object.entries(files)){
+      // Determinar categoría y nombre del documento
+      const allDocs=[...DOCS.proveedor,...DOCS.conductor,...DOCS.unidad];
+
+      // Para entradas múltiples: fileKey puede ser "cond1_c01" o "unid1_u01"
+      let cat='Proveedor', docId=fileKey, subNombre='', entryNum=1;
+      if(fileKey.startsWith('cond')){
+        cat='Conductor';
+        const parts=fileKey.split('_'); entryNum=parts[0].replace('cond','');
+        docId=parts[1];
+        const inputEl=document.getElementById('cond-nombre-'+entryNum);
+        subNombre=inputEl?inputEl.value.trim():'Conductor '+entryNum;
+      } else if(fileKey.startsWith('unid')){
+        cat='Unidad';
+        const parts=fileKey.split('_'); entryNum=parts[0].replace('unid','');
+        docId=parts[1];
+        const inputEl=document.getElementById('unid-placa-'+entryNum);
+        subNombre=inputEl?inputEl.value.trim().toUpperCase():'Unidad '+entryNum;
+      }
+
+      const docMeta=allDocs.find(d=>d.id===docId)||{name:docId};
+
+      // Convertir archivo a base64
+      const b64=await toBase64(file);
+
+      // Construir payload para Power Automate
+      const payload={
+        proveedor: prov,
+        ruc: ruc,
+        analista: ana,
+        email: email,
+        contacto: contacto,
+        observaciones: obs,
+        fecha: fecha,
+        categoria: cat,
+        subcarpeta: subNombre,
+        documento: docMeta.name,
+        nombre_archivo: file.name,
+        tipo_archivo: file.type||'application/octet-stream',
+        contenido_base64: b64,
+        // Ruta que Power Automate usará para crear la carpeta:
+        // Transportistas / ANALISTA / PROVEEDOR / Conductor o Unidad / subNombre /
+        ruta_carpeta: `Transportistas/${ana}/${prov}/${cat}${subNombre?'/'+subNombre:''}`
+      };
+
+      const res=await fetch(FLOW_URL,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(payload)
+      });
+
+      if(!res.ok) throw new Error('Error en '+file.name+': '+res.statusText);
+      enviados++;
+      document.getElementById('prog-fill').style.width=(enviados/total*100)+'%';
+      document.getElementById('prog-count').textContent=enviados+' / '+total;
+      showAlert('loading',`Subiendo ${enviados} de ${total} archivos...`);
+    }
+
+    showAlert('success',
+      '✅ '+total+' archivo(s) enviados correctamente a SharePoint.\n'+
+      'Carpeta: Transportistas / '+ana+' / '+prov+'\n'+
+      'El analista '+ana+' recibirá una notificación por correo.'
+    );
+    btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="17" height="17"><polyline points="20 6 9 17 4 12"/></svg> Enviado correctamente';
+
+  }catch(e){
+    showAlert('error','Error al enviar: '+e.message+'\nVerifica la URL del flujo en Power Automate.');
+    btn.disabled=false;
+  }
+}
+
+// Convierte File a base64 string
+function toBase64(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(reader.result.split(',')[1]);
+    reader.onerror=reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function demo(prov,ana,n){
+  const steps=[
+    'Preparando archivos...',
+    'Conectando con Power Automate...',
+    'Creando carpeta: Transportistas/'+ana+'/'+prov+'/',
+    'Guardando documentos en SharePoint...',
+    '¡Listo!'
+  ];
+  for(let i=0;i<steps.length;i++){
+    showAlert('loading',steps[i]);
+    await new Promise(r=>setTimeout(r,700));
+    document.getElementById('prog-fill').style.width=((i+1)/steps.length*100)+'%';
+  }
+  showAlert('success',
+    '✅ MODO DEMO — Los '+n+' archivo(s) se enviarían a SharePoint así:\n\n'+
+    '📁 Transportistas/\n'+
+    '  📁 '+ana+'/\n'+
+    '    📁 '+prov+'/\n'+
+    '      📁 Proveedor/ → documentos de empresa\n'+
+    '      📁 Conductor/Nombre/ → docs por conductor\n'+
+    '      📁 Unidad/Placa/ → docs por vehículo\n\n'+
+    '👉 Para activar: pega la URL de tu flujo Power Automate en FLOW_URL al inicio del script.'
+  );
+  const btn=document.getElementById('btn-submit');
+  btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="17" height="17"><polyline points="20 6 9 17 4 12"/></svg> Demo completado';
+}
+
+function showAlert(type,msg){
+  const box=document.getElementById('alert-box');
+  box.className='alert '+type;
+  const ico=type==='success'
+    ?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
+    :type==='error'
+    ?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+    :'<div class="spin"></div>';
+  box.innerHTML=ico+'<span style="white-space:pre-line">'+msg+'</span>';
+  box.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+</script>
+</body>
+</html>
