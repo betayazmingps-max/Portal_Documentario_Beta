@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Portal Proveedores — Complejo Agroindustrial Beta</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
@@ -27,12 +27,13 @@
   --s5:  #EDE8F8;
   --r:   #E02020;
   --rl:  #FEE8E8;
+  --amber: #F59E0B;
+  --amberl: #FFFBEB;
   --f:   'Outfit', sans-serif;
   --m:   'JetBrains Mono', monospace;
   --r8:  8px;
   --r12: 12px;
   --r16: 16px;
-  --r24: 24px;
   --shadow: 0 1px 3px rgba(82,18,160,.06), 0 4px 16px rgba(82,18,160,.08);
 }
 
@@ -40,250 +41,156 @@ body{font-family:var(--f);background:var(--bg);color:var(--s1);min-height:100vh}
 
 /* ══ NAVBAR ══════════════════════════════ */
 nav{
-  background:var(--p);
-  border-bottom:2px solid var(--g);
-  height:60px;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 2rem;
-  position:sticky;top:0;z-index:100;
+  background:var(--p);border-bottom:2px solid var(--g);
+  height:60px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 2rem;position:sticky;top:0;z-index:200;
   box-shadow:0 2px 16px rgba(82,18,160,.3);
 }
 .nav-logo{display:flex;align-items:center}
 .nav-right{display:flex;align-items:center;gap:10px}
-.nav-pill{
-  font-size:11px;font-weight:600;letter-spacing:.06em;
-  padding:4px 12px;border-radius:999px;
-  background:rgba(91,173,30,.2);color:#b4f06e;
-  border:1px solid rgba(91,173,30,.35);
-}
+.nav-pill{font-size:11px;font-weight:600;letter-spacing:.06em;padding:4px 12px;border-radius:999px;background:rgba(91,173,30,.2);color:#b4f06e;border:1px solid rgba(91,173,30,.35)}
 .nav-pill-p{background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.2)}
+.nav-session{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:5px 14px 5px 8px;cursor:pointer;transition:.15s}
+.nav-session:hover{background:rgba(255,255,255,.18)}
+.nav-session-avatar{width:26px;height:26px;border-radius:50%;background:var(--g2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--p);flex-shrink:0}
+.nav-session-name{font-size:11.5px;font-weight:600;color:#fff;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* ══ HERO ════════════════════════════════ */
-.hero{
-  background:var(--p);
-  position:relative;overflow:hidden;
-  padding:3.5rem 2rem 0;
-}
-/* Forma diagonal verde abajo */
-.hero-wave{
-  height:60px;
-  background:var(--bg);
-  clip-path:polygon(0 100%, 100% 0, 100% 100%);
-  position:relative;z-index:2;
-}
-.hero-wave::before{
-  content:'';position:absolute;inset:0;
-  background:var(--g);
-  clip-path:polygon(0 100%, 100% 30%, 100% 100%);
-  opacity:.35;
-}
-/* Círculos decorativos */
-.hero-dec1{
-  position:absolute;top:-80px;right:-80px;
-  width:340px;height:340px;border-radius:50%;
-  background:radial-gradient(circle, rgba(107,40,192,.6) 0%, transparent 70%);
-  pointer-events:none;
-}
-.hero-dec2{
-  position:absolute;bottom:20px;left:-60px;
-  width:200px;height:200px;border-radius:50%;
-  background:rgba(91,173,30,.12);
-  pointer-events:none;
-}
-/* Línea verde lateral derecha */
-.hero-accent{
-  position:absolute;top:0;right:0;
-  width:5px;height:100%;
-  background:linear-gradient(to bottom, var(--g2), var(--g));
-}
-
-.hero-content{
-  position:relative;z-index:2;
-  max-width:680px;margin:0 auto;
-  display:grid;grid-template-columns:1fr auto;
-  align-items:center;gap:2rem;
-  padding-bottom:1.5rem;
-}
-.hero-text h1{
-  font-size:2rem;font-weight:800;
-  color:var(--w);line-height:1.15;
-  margin-bottom:.5rem;letter-spacing:-.02em;
-}
+.hero{background:var(--p);position:relative;overflow:hidden;padding:3.5rem 2rem 0}
+.hero-wave{height:60px;background:var(--bg);clip-path:polygon(0 100%, 100% 0, 100% 100%);position:relative;z-index:2}
+.hero-wave::before{content:'';position:absolute;inset:0;background:var(--g);clip-path:polygon(0 100%, 100% 30%, 100% 100%);opacity:.35}
+.hero-dec1{position:absolute;top:-80px;right:-80px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle, rgba(107,40,192,.6) 0%, transparent 70%);pointer-events:none}
+.hero-dec2{position:absolute;bottom:20px;left:-60px;width:200px;height:200px;border-radius:50%;background:rgba(91,173,30,.12);pointer-events:none}
+.hero-accent{position:absolute;top:0;right:0;width:5px;height:100%;background:linear-gradient(to bottom, var(--g2), var(--g))}
+.hero-content{position:relative;z-index:2;max-width:680px;margin:0 auto;display:grid;grid-template-columns:1fr auto;align-items:center;gap:2rem;padding-bottom:1.5rem}
+.hero-text h1{font-size:2rem;font-weight:800;color:var(--w);line-height:1.15;margin-bottom:.5rem;letter-spacing:-.02em}
 .hero-text h1 span{color:var(--g2)}
-.hero-text p{
-  font-size:.875rem;color:rgba(255,255,255,.7);
-  line-height:1.6;max-width:380px;
-}
+.hero-text p{font-size:.875rem;color:rgba(255,255,255,.7);line-height:1.6;max-width:380px}
 .hero-chips{display:flex;gap:6px;margin-top:1rem;flex-wrap:wrap}
-.hchip{
-  font-size:10.5px;font-weight:600;letter-spacing:.05em;
-  padding:3px 10px;border-radius:999px;
-  border:1px solid rgba(255,255,255,.2);
-  color:rgba(255,255,255,.8);background:rgba(255,255,255,.1);
-}
+.hchip{font-size:10.5px;font-weight:600;letter-spacing:.05em;padding:3px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);background:rgba(255,255,255,.1)}
 .hchip.g{background:rgba(91,173,30,.25);border-color:rgba(91,173,30,.5);color:#b4f06e}
+.hero-logo-box{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:var(--r16);padding:1rem 1.25rem;display:flex;flex-direction:column;align-items:center;gap:8px;backdrop-filter:blur(4px);flex-shrink:0}
+.hero-logo-box .gbar{height:3px;width:80%;border-radius:99px;background:linear-gradient(90deg, var(--g2), transparent)}
 
-/* Logo en el hero */
-.hero-logo-box{
-  background:rgba(255,255,255,.1);
-  border:1px solid rgba(255,255,255,.15);
-  border-radius:var(--r16);
-  padding:1rem 1.25rem;
-  display:flex;flex-direction:column;align-items:center;gap:8px;
-  backdrop-filter:blur(4px);
-  flex-shrink:0;
-}
-.hero-logo-box img{height:44px;width:auto;filter:brightness(0) invert(1)}
-.hero-logo-box .gbar{
-  height:3px;width:80%;border-radius:99px;
-  background:linear-gradient(90deg, var(--g2), transparent);
-}
+/* ══ SCREENS ════════════════════════════ */
+.screen{display:none;animation:fadeUp .3s ease}
+.screen.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
-/* ══ PROGRESS ════════════════════════════ */
-.prog-bar{
-  background:var(--w);
-  border-bottom:1px solid var(--s4);
-}
-.prog-inner{
-  max-width:720px;margin:0 auto;
-  padding:.875rem 2rem;
-  display:flex;align-items:center;gap:12px;
-}
-.prog-label{font-size:11.5px;font-weight:600;color:var(--s2);white-space:nowrap}
-.prog-track{flex:1;height:5px;border-radius:99px;background:var(--s4);overflow:hidden}
-.prog-fill{
-  height:100%;border-radius:99px;
-  background:linear-gradient(90deg, var(--p), var(--g));
-  width:0%;transition:width .4s cubic-bezier(.4,0,.2,1);
-}
-.prog-num{
-  font-size:11px;font-weight:600;
-  font-family:var(--m);color:var(--p);white-space:nowrap;
-}
+/* ══ WRAP ════════════════════════════════ */
+.wrap{max-width:720px;margin:0 auto;padding:2rem 1.5rem 5rem;display:flex;flex-direction:column;gap:1.5rem}
+.wrap-sm{max-width:480px;margin:0 auto;padding:2.5rem 1.5rem 5rem}
 
-/* ══ WRAPPER ═════════════════════════════ */
-.wrap{
-  max-width:720px;margin:0 auto;
-  padding:2rem 1.5rem 5rem;
+/* ══ CARDS ═══════════════════════════════ */
+.card{background:var(--w);border:1px solid var(--s4);border-radius:var(--r16);padding:1.5rem;box-shadow:var(--shadow);transition:border-color .15s,box-shadow .15s}
+.card:focus-within{border-color:var(--p3);box-shadow:var(--shadow), 0 0 0 3px rgba(82,18,160,.07)}
+.card-title{font-size:13px;font-weight:700;color:var(--s1);margin-bottom:1.1rem;display:flex;align-items:center;gap:7px}
+.card-title svg{width:15px;height:15px;color:var(--p);flex-shrink:0}
+.card-title .dot{width:6px;height:6px;border-radius:50%;background:var(--g);flex-shrink:0}
+
+/* ══ ENTRY CARD (pantalla inicio) ════════ */
+.entry-card{
+  background:var(--w);border:1px solid var(--s4);border-radius:20px;
+  padding:2.5rem 2rem;box-shadow:var(--shadow);
   display:flex;flex-direction:column;gap:1.5rem;
 }
+.entry-divider{display:flex;align-items:center;gap:12px;color:var(--s3);font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.entry-divider::before,.entry-divider::after{content:'';flex:1;height:1px;background:var(--s4)}
+
+/* ══ OPTION BUTTONS ══════════════════════ */
+.opt-btn{
+  width:100%;padding:1rem 1.25rem;
+  background:var(--pll);border:1.5px solid var(--s4);border-radius:var(--r12);
+  display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .15s;text-align:left;font-family:var(--f);
+}
+.opt-btn:hover{border-color:var(--p3);background:var(--pl);box-shadow:0 4px 16px rgba(82,18,160,.1)}
+.opt-btn-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.opt-btn-icon.green{background:var(--gl);color:var(--g)}
+.opt-btn-icon.purple{background:var(--pl);color:var(--p)}
+.opt-btn-text strong{display:block;font-size:13.5px;font-weight:700;color:var(--s1);margin-bottom:2px}
+.opt-btn-text span{font-size:11.5px;color:var(--s3)}
+.opt-btn-arrow{margin-left:auto;color:var(--s3);flex-shrink:0}
 
 /* ══ STEP LABEL ══════════════════════════ */
-.step-label{
-  display:flex;align-items:center;gap:10px;
-  font-size:11px;font-weight:700;letter-spacing:.12em;
-  color:var(--s3);text-transform:uppercase;
-}
-.step-num{
-  width:22px;height:22px;border-radius:50%;
-  background:var(--p);color:var(--w);
-  font-size:11px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-}
+.step-label{display:flex;align-items:center;gap:10px;font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--s3);text-transform:uppercase}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--p);color:var(--w);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-num.done{background:var(--g)}
 .step-line{flex:1;height:1px;background:var(--s4)}
-
-/* ══ CARD ════════════════════════════════ */
-.card{
-  background:var(--w);
-  border:1px solid var(--s4);
-  border-radius:var(--r16);
-  padding:1.5rem;
-  box-shadow:var(--shadow);
-  transition:border-color .15s, box-shadow .15s;
-}
-.card:focus-within{
-  border-color:var(--p3);
-  box-shadow:var(--shadow), 0 0 0 3px rgba(82,18,160,.07);
-}
-.card-title{
-  font-size:13px;font-weight:700;color:var(--s1);
-  margin-bottom:1.1rem;
-  display:flex;align-items:center;gap:7px;
-}
-.card-title svg{width:15px;height:15px;color:var(--p);flex-shrink:0}
-.card-title .dot{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--g);flex-shrink:0;
-}
 
 /* ══ FORM ════════════════════════════════ */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:.875rem}
-@media(max-width:500px){.g2{grid-template-columns:1fr}}
+@media(max-width:540px){.g2{grid-template-columns:1fr}}
 .field{display:flex;flex-direction:column;gap:.3rem}
-
 label{font-size:11.5px;font-weight:600;color:var(--s2);letter-spacing:.01em}
 label .req{color:var(--p);margin-left:2px}
-
-input,select,textarea{
-  font-family:var(--f);font-size:13.5px;color:var(--s1);
-  background:var(--pll);
-  border:1.5px solid var(--s4);
-  border-radius:var(--r8);
-  padding:.55rem .875rem;
-  outline:none;
-  transition:border-color .15s, box-shadow .15s, background .15s;
-  width:100%;appearance:none;
-}
-input:focus,select:focus,textarea:focus{
-  border-color:var(--p);
-  background:var(--w);
-  box-shadow:0 0 0 3px rgba(82,18,160,.09);
-}
+input,select,textarea{font-family:var(--f);font-size:13.5px;color:var(--s1);background:var(--pll);border:1.5px solid var(--s4);border-radius:var(--r8);padding:.55rem .875rem;outline:none;transition:border-color .15s,box-shadow .15s,background .15s;width:100%;appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--p);background:var(--w);box-shadow:0 0 0 3px rgba(82,18,160,.09)}
 input::placeholder,textarea::placeholder{color:var(--s3);font-size:13px}
-select{
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%235C4880' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 11px center;padding-right:2rem;cursor:pointer;
-}
+input:read-only{background:var(--s5);color:var(--s2);cursor:not-allowed}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%235C4880' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:2rem;cursor:pointer}
+textarea{resize:vertical;min-height:80px;line-height:1.5}
 option{background:var(--w)}
+.hint{font-size:10.5px;color:var(--s3);margin-top:2px;display:block}
+.hint.ok{color:var(--g)}
+.hint.err{color:var(--r)}
 
-/* ══ TABS ════════════════════════════════ */
-.tabs{
-  display:flex;gap:3px;
-  background:var(--s5);
-  border:1px solid var(--s4);
-  border-radius:var(--r12);
-  padding:3px;margin-bottom:1.25rem;
+/* ══ OTP INPUT ═══════════════════════════ */
+.otp-wrap{display:flex;gap:10px;justify-content:center;margin:1rem 0}
+.otp-digit{
+  width:52px;height:60px;text-align:center;font-size:24px;font-weight:700;
+  font-family:var(--m);letter-spacing:0;
+  border:2px solid var(--s4);border-radius:12px;
+  background:var(--pll);color:var(--s1);
+  transition:all .15s;caret-color:var(--p);
 }
-.tab{
-  flex:1;padding:7px 6px;text-align:center;
-  font-size:12px;font-weight:600;font-family:var(--f);
-  border-radius:10px;border:none;background:transparent;
-  color:var(--s2);cursor:pointer;transition:all .15s;
-}
-.tab.active{
-  background:var(--p);color:var(--w);
-  box-shadow:0 2px 8px rgba(82,18,160,.3);
-}
-.tab-panel{display:none}
-.tab-panel.active{display:block}
+.otp-digit:focus{border-color:var(--p);background:var(--w);box-shadow:0 0 0 3px rgba(82,18,160,.1);outline:none}
+.otp-digit.filled{border-color:var(--p3);background:var(--pl)}
+@media(max-width:400px){.otp-digit{width:42px;height:52px;font-size:20px}}
 
-/* ══ DOC GRID ════════════════════════════ */
-.doc-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill, minmax(170px, 1fr));
-  gap:8px;
+/* ══ BOTONES ═════════════════════════════ */
+.btn{
+  width:100%;padding:.85rem 1.5rem;
+  border:none;border-radius:var(--r12);
+  font-family:var(--f);font-size:14px;font-weight:700;
+  cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;justify-content:center;gap:9px;letter-spacing:-.01em;
 }
-.doc-item{
-  position:relative;
-  border:1.5px solid var(--s4);
-  border-radius:var(--r12);
-  overflow:hidden;cursor:pointer;
-  background:var(--pll);
-  transition:all .15s;
+.btn-primary{background:linear-gradient(135deg, var(--p) 0%, var(--p2) 100%);color:var(--w);box-shadow:0 4px 16px rgba(82,18,160,.35)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(82,18,160,.4);background:linear-gradient(135deg, var(--p2) 0%, var(--p3) 100%)}
+.btn-primary:active{transform:scale(.99)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-green{background:linear-gradient(135deg, var(--g) 0%, var(--g2) 100%);color:var(--w);box-shadow:0 4px 16px rgba(91,173,30,.3)}
+.btn-green:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(91,173,30,.4)}
+.btn-outline{background:transparent;border:1.5px solid var(--s4);color:var(--s2)}
+.btn-outline:hover{border-color:var(--p3);color:var(--p);background:var(--pll)}
+.btn svg{width:16px;height:16px;flex-shrink:0}
+
+/* ══ BADGE ESTADO ════════════════════════ */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:600;font-family:var(--m)}
+.badge.green{background:var(--gl);color:#2d6010;border:1px solid rgba(91,173,30,.3)}
+.badge.amber{background:var(--amberl);color:#92400e;border:1px solid rgba(245,158,11,.3)}
+.badge.red{background:var(--rl);color:var(--r);border:1px solid rgba(224,32,32,.2)}
+
+/* ══ BANNER PROVEEDOR EXISTENTE ══════════ */
+.existing-banner{
+  background:linear-gradient(135deg, var(--gl) 0%, var(--gll) 100%);
+  border:1.5px solid rgba(91,173,30,.4);border-left:5px solid var(--g);
+  border-radius:var(--r16);padding:1.25rem 1.5rem;
+  display:flex;align-items:center;gap:16px;
 }
+.existing-banner-icon{width:48px;height:48px;border-radius:12px;background:var(--g);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
+.existing-banner h3{font-size:14px;font-weight:700;color:#2d6010;margin-bottom:3px}
+.existing-banner p{font-size:12px;color:#3d7a18}
+
+/* ══ FILE UPLOAD GRID ════════════════════ */
+.doc-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(170px,1fr));gap:8px}
+.doc-item{position:relative;border:1.5px solid var(--s4);border-radius:var(--r12);overflow:hidden;cursor:pointer;background:var(--pll);transition:all .15s}
 .doc-item:hover{border-color:var(--p3);box-shadow:0 3px 12px rgba(82,18,160,.12)}
 .doc-item.has-file{border-color:var(--g);background:var(--gll)}
 .doc-item.required-missing{border-color:var(--r);background:var(--rl)}
 .doc-item input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .doc-face{padding:12px 12px 10px;pointer-events:none}
-.doc-icon{
-  width:32px;height:32px;border-radius:8px;
-  display:flex;align-items:center;justify-content:center;
-  margin-bottom:8px;
-  background:var(--w);border:1px solid var(--s4);
-  color:var(--p);transition:all .15s;
-}
+.doc-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;background:var(--w);border:1px solid var(--s4);color:var(--p);transition:all .15s}
 .doc-item.has-file .doc-icon{background:var(--g);border-color:transparent;color:var(--w)}
 .doc-item.required-missing .doc-icon{background:var(--r);border-color:transparent;color:var(--w)}
 .doc-name{font-size:11.5px;font-weight:600;color:var(--s1);line-height:1.35;margin-bottom:3px}
@@ -291,123 +198,236 @@ option{background:var(--w)}
 .doc-status{font-size:10px;font-family:var(--m);color:var(--s3)}
 .doc-item.has-file .doc-status{color:var(--g)}
 .doc-item.required-missing .doc-status{color:var(--r)}
-.doc-req-tag{
-  position:absolute;top:7px;right:7px;
-  font-size:9px;font-family:var(--m);font-weight:500;
-  padding:2px 6px;border-radius:999px;
-  background:rgba(82,18,160,.1);color:var(--p);
-}
+.doc-req-tag{position:absolute;top:7px;right:7px;font-size:9px;font-family:var(--m);font-weight:500;padding:2px 6px;border-radius:999px;background:rgba(82,18,160,.1);color:var(--p)}
 
-/* ══ INFO CARD ═══════════════════════════ */
-.info-card{
-  background:linear-gradient(135deg, var(--pl) 0%, var(--gll) 100%);
-  border:1px solid var(--s4);
-  border-left:4px solid var(--p);
-  border-radius:var(--r12);
-  padding:1rem 1.25rem;
-  display:flex;gap:14px;align-items:center;
-}
-.info-icon{
-  width:40px;height:40px;flex-shrink:0;border-radius:10px;
-  background:var(--p);color:var(--w);
-  display:flex;align-items:center;justify-content:center;
-}
-.info-icon svg{width:18px;height:18px}
-.info-text p{font-size:13px;font-weight:700;color:var(--p);margin-bottom:2px}
-.info-text span{font-size:11.5px;color:var(--s2)}
-
-/* ══ SUBMIT ══════════════════════════════ */
-.btn-wrap{display:flex;flex-direction:column;gap:.75rem}
-.btn-submit{
-  width:100%;padding:.95rem 1.5rem;
-  background:linear-gradient(135deg, var(--p) 0%, var(--p2) 100%);
-  border:none;border-radius:var(--r12);
-  font-family:var(--f);font-size:15px;font-weight:700;
-  color:var(--w);cursor:pointer;
-  box-shadow:0 4px 16px rgba(82,18,160,.35);
-  transition:all .15s;
-  display:flex;align-items:center;justify-content:center;gap:9px;
-  letter-spacing:-.01em;
-}
-.btn-submit:hover{
-  transform:translateY(-2px);
-  box-shadow:0 8px 24px rgba(82,18,160,.4);
-  background:linear-gradient(135deg, var(--p2) 0%, var(--p3) 100%);
-}
-.btn-submit:active{transform:scale(.99)}
-.btn-submit:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.btn-submit svg{width:17px;height:17px;flex-shrink:0}
+/* ══ TABS ════════════════════════════════ */
+.tabs{display:flex;gap:3px;background:var(--s5);border:1px solid var(--s4);border-radius:var(--r12);padding:3px;margin-bottom:1.25rem}
+.tab{flex:1;padding:7px 6px;text-align:center;font-size:12px;font-weight:600;font-family:var(--f);border-radius:10px;border:none;background:transparent;color:var(--s2);cursor:pointer;transition:all .15s}
+.tab.active{background:var(--p);color:var(--w);box-shadow:0 2px 8px rgba(82,18,160,.3)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
 
 /* ══ ALERT ═══════════════════════════════ */
-.alert{
-  display:none;padding:.9rem 1.1rem;
-  border-radius:var(--r12);border:1.5px solid;
-  font-size:13px;line-height:1.55;
-}
+.alert{display:none;padding:.9rem 1.1rem;border-radius:var(--r12);border:1.5px solid;font-size:13px;line-height:1.55}
 .alert.success{display:flex;gap:10px;align-items:flex-start;background:var(--gl);border-color:var(--g);color:#2d6010}
 .alert.error  {display:flex;gap:10px;align-items:flex-start;background:var(--rl);border-color:var(--r);color:var(--r)}
 .alert.loading{display:flex;gap:10px;align-items:center;background:var(--pl);border-color:var(--p);color:var(--p)}
+.alert.warning{display:flex;gap:10px;align-items:flex-start;background:var(--amberl);border-color:var(--amber);color:#92400e}
 .spin{width:15px;height:15px;flex-shrink:0;border:2px solid rgba(82,18,160,.2);border-top-color:var(--p);border-radius:50%;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
+
+/* ══ PROGRESS BAR ════════════════════════ */
+.prog-bar{background:var(--w);border-bottom:1px solid var(--s4)}
+.prog-inner{max-width:720px;margin:0 auto;padding:.875rem 2rem;display:flex;align-items:center;gap:12px}
+.prog-label{font-size:11.5px;font-weight:600;color:var(--s2);white-space:nowrap}
+.prog-track{flex:1;height:5px;border-radius:99px;background:var(--s4);overflow:hidden}
+.prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg, var(--p), var(--g));width:0%;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.prog-num{font-size:11px;font-weight:600;font-family:var(--m);color:var(--p);white-space:nowrap}
+
+/* ══ CONTADOR REENVÍO OTP ════════════════ */
+.otp-timer{font-size:12px;color:var(--s3);text-align:center;font-family:var(--m)}
+.otp-timer strong{color:var(--p)}
+.btn-resend{background:none;border:none;font-family:var(--f);font-size:12.5px;font-weight:600;color:var(--p);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.btn-resend:disabled{color:var(--s3);cursor:not-allowed;text-decoration:none}
+
+/* ══ CARPETA INFO ════════════════════════ */
+.folder-path{
+  background:var(--s5);border:1px solid var(--s4);border-radius:var(--r8);
+  padding:.6rem .875rem;font-family:var(--m);font-size:11.5px;color:var(--s2);
+  word-break:break-all;line-height:1.6;
+}
+.folder-path span{color:var(--p);font-weight:600}
+
+/* ══ ENTRY LANDING ═══════════════════════ */
+.landing-hero{
+  text-align:center;padding:3rem 2rem 1rem;
+  max-width:480px;margin:0 auto;
+}
+.landing-hero .big-icon{
+  width:72px;height:72px;border-radius:20px;
+  background:linear-gradient(135deg, var(--p) 0%, var(--p2) 100%);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 1.25rem;
+  box-shadow:0 8px 32px rgba(82,18,160,.3);
+}
+.landing-hero h2{font-size:1.6rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.5rem}
+.landing-hero p{font-size:.875rem;color:var(--s2);line-height:1.6}
 
 /* ══ FOOTER ══════════════════════════════ */
 footer{
   background:var(--s1);
-  padding:1.75rem 2rem;
-  display:flex;align-items:center;justify-content:space-between;
-  flex-wrap:wrap;gap:1rem;
+  padding:1.5rem 2rem;
+  display:flex;flex-direction:column;align-items:center;
+  gap:.75rem;border-top:3px solid var(--g);
 }
-.footer-logo{display:flex;align-items:center}
+.footer-dev{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(121,204,56,.3);
+  border-radius:12px;padding:.6rem 1.1rem;
+}
+.footer-dev-avatar{
+  width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--p),var(--g2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;color:#fff;
+}
+.footer-dev-info{line-height:1.3}
+.footer-dev-name{font-size:12px;font-weight:700;color:#fff}
+.footer-dev-role{font-size:10px;color:rgba(255,255,255,.5);letter-spacing:.03em}
+.footer-copy{font-size:9.5px;color:rgba(255,255,255,.25);text-align:center}
 .footer-text{font-size:11px;color:rgba(255,255,255,.4);text-align:right}
 .footer-text strong{color:rgba(255,255,255,.7)}
+
+/* ══ BACK LINK ═══════════════════════════ */
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--s2);cursor:pointer;transition:.15s;border:none;background:none;font-family:var(--f);padding:0}
+.back-link:hover{color:var(--p)}
+.back-link svg{width:14px;height:14px}
+
+/* ══ INFO CARD ═══════════════════════════ */
+.info-card{background:linear-gradient(135deg, var(--pl) 0%, var(--gll) 100%);border:1px solid var(--s4);border-left:4px solid var(--p);border-radius:var(--r12);padding:1rem 1.25rem;display:flex;gap:14px;align-items:center}
+.info-icon{width:40px;height:40px;flex-shrink:0;border-radius:10px;background:var(--p);color:var(--w);display:flex;align-items:center;justify-content:center}
+.info-icon svg{width:18px;height:18px}
+.info-text p{font-size:13px;font-weight:700;color:var(--p);margin-bottom:2px}
+.info-text span{font-size:11.5px;color:var(--s2)}
+
+/* ══ RUC STATE ═══════════════════════════ */
+#ruc-spinner,#ruc-ok,#ruc-err{position:absolute;right:10px;top:50%;transform:translateY(-50%)}
+
+/* ══ PANTALLA ÉXITO ══════════════════════ */
+#screen-success {
+  display:none;
+  position:fixed;inset:0;z-index:9000;
+  background:linear-gradient(135deg, #1C0840 0%, #3a0d7a 50%, #1a3a0a 100%);
+  flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:2rem;
+  animation:fadeInSuccess .5s ease;
+}
+#screen-success.show { display:flex; }
+@keyframes fadeInSuccess {
+  from { opacity:0; transform:scale(.96); }
+  to   { opacity:1; transform:scale(1); }
+}
+.success-icon-wrap {
+  width:100px;height:100px;border-radius:50%;
+  background:linear-gradient(135deg, var(--g) 0%, var(--g2) 100%);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 1.75rem;
+  box-shadow:0 0 0 16px rgba(91,173,30,.15), 0 0 0 32px rgba(91,173,30,.07);
+  animation:popIn .6s cubic-bezier(.34,1.56,.64,1) .2s both;
+}
+@keyframes popIn {
+  from { transform:scale(0) rotate(-20deg); opacity:0; }
+  to   { transform:scale(1) rotate(0deg);  opacity:1; }
+}
+.success-title {
+  font-size:2.4rem;font-weight:900;color:#fff;
+  letter-spacing:-.03em;line-height:1.1;
+  margin-bottom:.75rem;
+  animation:slideUp .5s ease .4s both;
+}
+.success-title span { color:var(--g2); }
+.success-sub {
+  font-size:1rem;color:rgba(255,255,255,.75);
+  line-height:1.6;max-width:380px;margin:0 auto 2rem;
+  animation:slideUp .5s ease .55s both;
+}
+.success-meta {
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:16px;padding:1.1rem 1.5rem;
+  margin-bottom:2rem;
+  font-size:12.5px;color:rgba(255,255,255,.7);
+  line-height:1.8;font-family:var(--m);
+  animation:slideUp .5s ease .65s both;
+  max-width:420px;width:100%;
+}
+.success-meta strong { color:var(--g2); }
+.success-chips {
+  display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+  margin-bottom:2rem;
+  animation:slideUp .5s ease .75s both;
+}
+.success-chip {
+  padding:5px 14px;border-radius:999px;
+  font-size:11.5px;font-weight:700;
+  background:rgba(121,204,56,.2);border:1px solid rgba(121,204,56,.4);
+  color:#b4f06e;
+}
+.success-btn {
+  padding:.9rem 2.5rem;
+  background:linear-gradient(135deg, var(--g) 0%, var(--g2) 100%);
+  border:none;border-radius:14px;
+  font-family:var(--f);font-size:15px;font-weight:800;
+  color:var(--s1);cursor:pointer;
+  box-shadow:0 6px 24px rgba(91,173,30,.4);
+  transition:all .2s;letter-spacing:-.01em;
+  animation:slideUp .5s ease .85s both;
+  display:inline-flex;align-items:center;gap:9px;
+}
+.success-btn:hover { transform:translateY(-3px); box-shadow:0 10px 32px rgba(91,173,30,.5); }
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+/* confeti */
+.confetti-piece {
+  position:fixed;top:-10px;border-radius:2px;
+  animation:confettiFall linear forwards;
+  pointer-events:none;z-index:9001;
+}
+@keyframes confettiFall {
+  to { transform:translateY(110vh) rotate(720deg); opacity:0; }
+}
 </style>
 </head>
 <body>
 
-<!-- NAVBAR -->
+<!-- ══ NAVBAR ══════════════════════════════════════════════ -->
 <nav>
   <div class="nav-logo">
-    <div style="display:flex;flex-direction:column;line-height:1;gap:2px;">
-  <span style="font-family:'Outfit',sans-serif;font-size:26px;font-weight:800;letter-spacing:-.03em;color:#fff;">bet<span style="color:#79CC38;">a</span></span>
-  <span style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:500;letter-spacing:.08em;color:rgba(255,255,255,.6);text-transform:lowercase;">complejo agroindustrial</span>
-</div>
+    <div style="display:flex;flex-direction:column;line-height:1;gap:2px">
+      <span style="font-family:'Outfit',sans-serif;font-size:26px;font-weight:800;letter-spacing:-.03em;color:#fff">bet<span style="color:#79CC38">a</span></span>
+      <span style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:500;letter-spacing:.08em;color:rgba(255,255,255,.6);text-transform:lowercase">complejo agroindustrial</span>
+    </div>
   </div>
   <div class="nav-right">
     <span class="nav-pill-p nav-pill">Portal Proveedores</span>
-    <span class="nav-pill">Sistema Activo</span>
+    <span id="demo-badge" class="nav-pill" style="background:rgba(245,158,11,.25);color:#fde68a;border-color:rgba(245,158,11,.4)">⚡ DEMO</span>
+    <div id="nav-session" class="nav-session" style="display:none" onclick="cerrarSesion()">
+      <div class="nav-session-avatar" id="nav-avatar">?</div>
+      <span class="nav-session-name" id="nav-name">Proveedor</span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2.5" stroke-linecap="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </div>
   </div>
 </nav>
 
-<!-- HERO -->
+<!-- ══ HERO ════════════════════════════════════════════════ -->
 <div class="hero">
-  <div class="hero-dec1"></div>
-  <div class="hero-dec2"></div>
-  <div class="hero-accent"></div>
-
+  <div class="hero-dec1"></div><div class="hero-dec2"></div><div class="hero-accent"></div>
   <div class="hero-content">
     <div class="hero-text">
-      <h1>Portal de<br><span>Documentos</span></h1>
-      <p>Sube los documentos requeridos para tu habilitación como proveedor de transporte — <strong style="color:#b4f06e">Complejo Agroindustrial Beta</strong></p>
+      <h1>Portal de<br><span>Proveedores</span></h1>
+      <p>Regístrate o accede para subir los documentos requeridos — <strong style="color:#b4f06e">Complejo Agroindustrial Beta</strong></p>
       <div class="hero-chips">
-        <span class="hchip">Sin registro</span>
-        <span class="hchip">Archivos seguros</span>
+        <span class="hchip">Seguro</span>
+        <span class="hchip">Sin registro previo</span>
         <span class="hchip g">Beta Activo</span>
       </div>
     </div>
     <div class="hero-logo-box">
-      <div style="display:flex;flex-direction:column;align-items:center;line-height:1;gap:3px;">
-  <span style="font-family:'Outfit',sans-serif;font-size:32px;font-weight:800;letter-spacing:-.03em;color:#fff;">bet<span style="color:#79CC38;">a</span></span>
-  <span style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:500;letter-spacing:.08em;color:rgba(255,255,255,.65);text-transform:lowercase;">complejo agroindustrial</span>
-</div>
+      <div style="display:flex;flex-direction:column;align-items:center;line-height:1;gap:3px">
+        <span style="font-family:'Outfit',sans-serif;font-size:32px;font-weight:800;letter-spacing:-.03em;color:#fff">bet<span style="color:#79CC38">a</span></span>
+        <span style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:500;letter-spacing:.08em;color:rgba(255,255,255,.65);text-transform:lowercase">complejo agroindustrial</span>
+      </div>
       <div class="gbar"></div>
     </div>
   </div>
-
   <div class="hero-wave"></div>
 </div>
 
-<!-- PROGRESS -->
-<div class="prog-bar">
+<!-- ══ PROGRESS BAR (visible solo en pantalla documentos) ══ -->
+<div class="prog-bar" id="prog-bar-wrap" style="display:none">
   <div class="prog-inner">
     <span class="prog-label">Progreso de carga</span>
     <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
@@ -415,484 +435,1329 @@ footer{
   </div>
 </div>
 
-<!-- MAIN -->
-<div class="wrap">
-
-  <!-- Info strip -->
-  <div class="info-card">
-    <div class="info-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-        <rect x="3" y="14" width="7" height="7" rx="1"/>
-        <path d="M14 14h.01M14 17h3M17 14v3M20 17v3M20 20h-3"/>
-      </svg>
+<!-- ════════════════════════════════════════════════════════
+     PANTALLA 1 — ENTRADA (elegir: registrarse o ingresar)
+     ════════════════════════════════════════════════════════ -->
+<div id="screen-entry" class="screen active">
+  <div class="wrap-sm">
+    <div class="landing-hero">
+      <div class="big-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <h2>Bienvenido al Portal</h2>
+      <p>¿Es tu primera vez aquí? Regístrate. ¿Ya tienes cuenta? Ingresa con tu RUC y correo.</p>
     </div>
-    <div class="info-text">
-      <p>Comparte este portal por QR o enlace directo</p>
-      <span>El proveedor abre desde su celular — sin instalar nada, sin necesitar cuenta</span>
+
+    <div class="entry-card">
+      <button class="opt-btn" onclick="irA('screen-registro')">
+        <div class="opt-btn-icon green">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        </div>
+        <div class="opt-btn-text">
+          <strong>Registrarme como proveedor</strong>
+          <span>Primera vez — crea tu perfil y carpeta en SharePoint</span>
+        </div>
+        <svg class="opt-btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+
+      <div class="entry-divider">ya tengo cuenta</div>
+
+      <button class="opt-btn" onclick="irA('screen-login')">
+        <div class="opt-btn-icon purple">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        </div>
+        <div class="opt-btn-text">
+          <strong>Ingresar con mi RUC</strong>
+          <span>Ya estoy registrado — acceder a mi carpeta</span>
+        </div>
+        <svg class="opt-btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
     </div>
   </div>
+</div>
 
-  <!-- PASO 1 -->
-  <div class="step-label">
-    <div class="step-num">1</div>
-    <span>Identificación</span>
-    <div class="step-line"></div>
+<!-- ════════════════════════════════════════════════════════
+     PANTALLA 2 — REGISTRO NUEVO
+     ════════════════════════════════════════════════════════ -->
+<div id="screen-registro" class="screen">
+  <div class="wrap">
+    <button class="back-link" onclick="irA('screen-entry')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      Volver al inicio
+    </button>
+
+    <!-- Paso 1 -->
+    <div class="step-label"><div class="step-num">1</div><span>Datos de empresa (SUNAT)</span><div class="step-line"></div></div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+        Identificación fiscal
+        <div class="dot"></div>
+      </div>
+
+      <div class="g2" style="margin-bottom:.875rem">
+        <!-- RUC -->
+        <div class="field">
+          <label>RUC <span class="req">*</span></label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <div style="position:relative;flex:1">
+              <input type="text" id="reg-ruc" placeholder="20xxxxxxxxx" maxlength="11"
+                oninput="onRucInput(this.value)" style="padding-right:2.5rem">
+              <div id="ruc-spinner" style="display:none"><div class="spin"></div></div>
+              <svg id="ruc-ok" style="display:none;color:var(--g)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <svg id="ruc-err" style="display:none;color:var(--r)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            </div>
+            <button type="button" onclick="buscarRucManual()" title="Buscar"
+              style="flex-shrink:0;height:38px;padding:0 12px;background:var(--p);color:#fff;border:none;border-radius:var(--r8);cursor:pointer;font-size:12px;font-weight:600;font-family:var(--f);display:flex;align-items:center;gap:5px;transition:.15s"
+              onmouseover="this.style.background='var(--p2)'" onmouseout="this.style.background='var(--p)'">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              Buscar
+            </button>
+          </div>
+          <span id="ruc-hint" class="hint">Ingresa 11 dígitos — se completará automáticamente</span>
+        </div>
+        <!-- Razón social -->
+        <div class="field">
+          <label>Razón social <span class="req">*</span></label>
+          <input type="text" id="reg-razon" placeholder="Se completa con el RUC..." readonly>
+        </div>
+      </div>
+
+      <!-- Extras SUNAT -->
+      <div id="sunat-extra" style="display:none;margin-bottom:.875rem">
+        <div class="g2">
+          <div class="field">
+            <label>Estado SUNAT</label>
+            <input type="text" id="sunat-estado" readonly>
+          </div>
+          <div class="field">
+            <label>Condición</label>
+            <input type="text" id="sunat-condicion" readonly>
+          </div>
+        </div>
+        <div class="field" style="margin-top:.6rem">
+          <label>Dirección fiscal</label>
+          <input type="text" id="sunat-direccion" readonly>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paso 2 -->
+    <div class="step-label"><div class="step-num">2</div><span>Contacto y analista</span><div class="step-line"></div></div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Datos de contacto
+        <div class="dot"></div>
+      </div>
+      <div class="g2" style="margin-bottom:.875rem">
+        <div class="field">
+          <label>Nombre de contacto <span class="req">*</span></label>
+          <input type="text" id="reg-contacto" placeholder="Gerente / Representante">
+        </div>
+        <div class="field">
+          <label>Correo electrónico <span class="req">*</span></label>
+          <input type="email" id="reg-email" placeholder="proveedor@empresa.com">
+          <span class="hint">Se usará para enviar el código de verificación</span>
+        </div>
+      </div>
+      <div class="g2" style="margin-bottom:.875rem">
+        <div class="field">
+          <label>Teléfono / WhatsApp</label>
+          <input type="tel" id="reg-telefono" placeholder="+51 9xx xxx xxx">
+        </div>
+        <div class="field">
+          <label>Categoría de transporte <span class="req">*</span></label>
+          <select id="reg-categoria">
+            <option value="">Seleccionar...</option>
+            <option value="TRANSPORTE DE SERVICIOS NORTE Y SUR">Servicios Norte y Sur</option>
+            <option value="TRANSPORTE DE PERSONAL">Transporte de Personal</option>
+            <option value="PROYECTO HANNA">Proyecto Hanna</option>
+            <option value="PROGRAMA DE MANTENIMIENTO">Programa de Mantenimiento</option>
+          </select>
+          <span class="hint">Carpeta donde se guardarán tus documentos</span>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="field">
+          <label>Analista responsable <span class="req">*</span></label>
+          <select id="reg-analista">
+            <option value="">Seleccionar...</option>
+            <option value="CREGALADO">C. REGALADO</option>
+            <option value="EODAR">E. ODAR</option>
+            <option value="JPADILLA">J. PADILLA</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Año de registro</label>
+          <input type="text" id="reg-anio" value="TRANSPORTE 2026" readonly style="background:var(--s5);color:var(--s2);cursor:not-allowed">
+          <span class="hint">Carpeta activa del año en curso</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paso 3 -->
+    <div class="step-label"><div class="step-num">3</div><span>Documento de presentación</span><div class="step-line"></div></div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Adjunta un documento inicial
+        <div class="dot"></div>
+      </div>
+      <p style="font-size:12.5px;color:var(--s2);margin-bottom:1rem;line-height:1.6">
+        Sube tu brochure, cotización, ficha técnica, carta de presentación o cualquier documento que nos ayude a conocer tu empresa.
+      </p>
+      <div class="doc-grid" id="reg-docs-grid">
+        <!-- Se genera dinámicamente -->
+      </div>
+    </div>
+
+    <!-- Observaciones -->
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Observaciones opcionales
+      </div>
+      <div class="field">
+        <textarea id="reg-obs" placeholder="Servicios que ofreces, rutas, capacidad de flota, etc."></textarea>
+      </div>
+    </div>
+
+    <div id="reg-alert" class="alert"></div>
+
+    <button class="btn btn-green" onclick="submitRegistro()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      Registrarme y recibir código de verificación
+    </button>
   </div>
+</div>
 
-  <div class="card">
-    <div class="card-title">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
-      Datos del proveedor
-      <div class="dot"></div>
-    </div>
-    <div class="g2" style="margin-bottom:.875rem">
-      <div class="field">
-        <label>Nombre del proveedor <span class="req">*</span></label>
-        <input type="text" id="proveedor" placeholder="Ej: COLMOS S.A.C.">
+<!-- ════════════════════════════════════════════════════════
+     PANTALLA 3 — LOGIN (ya registrado)
+     ════════════════════════════════════════════════════════ -->
+<div id="screen-login" class="screen">
+  <div class="wrap-sm">
+    <button class="back-link" onclick="irA('screen-entry')" style="margin-bottom:1.5rem">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      Volver al inicio
+    </button>
+
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Identificación
+        <div class="dot"></div>
       </div>
-      <div class="field">
-        <label>RUC</label>
-        <input type="text" id="ruc" placeholder="20612307599" maxlength="11">
+
+      <div class="field" style="margin-bottom:.875rem">
+        <label>RUC de empresa <span class="req">*</span></label>
+        <input type="text" id="login-ruc" placeholder="20xxxxxxxxx" maxlength="11"
+          oninput="this.value=this.value.replace(/\D/g,'').slice(0,11)">
       </div>
-    </div>
-    <div class="g2" style="margin-bottom:.875rem">
-      <div class="field">
-        <label>Analista responsable <span class="req">*</span></label>
-        <select id="analista">
-          <option value="">Seleccionar...</option>
-          <option>JESUS</option>
-          <option>ODAR</option>
-          <option>REGALADO</option>
-          <option>WILBER</option>
-        </select>
+      <div class="field" style="margin-bottom:1.25rem">
+        <label>Correo electrónico registrado <span class="req">*</span></label>
+        <input type="email" id="login-email" placeholder="proveedor@empresa.com">
+        <span class="hint">Recibirás un código de 6 dígitos en este correo</span>
       </div>
-      <div class="field">
-        <label>Correo de confirmación</label>
-        <input type="email" id="email" placeholder="proveedor@empresa.com">
-      </div>
-    </div>
-    <div class="field">
-      <label>Contacto / representante legal</label>
-      <input type="text" id="contacto" placeholder="Nombre completo del representante">
+
+      <div id="login-alert" class="alert" style="margin-bottom:.875rem"></div>
+
+      <button class="btn btn-primary" onclick="solicitarOtpLogin()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Enviar código al correo
+      </button>
     </div>
   </div>
+</div>
 
-  <!-- PASO 2 -->
-  <div class="step-label">
-    <div class="step-num">2</div>
-    <span>Documentos requeridos</span>
-    <div class="step-line"></div>
+<!-- ════════════════════════════════════════════════════════
+     PANTALLA 4 — VERIFICACIÓN OTP
+     ════════════════════════════════════════════════════════ -->
+<div id="screen-otp" class="screen">
+  <div class="wrap-sm">
+    <button class="back-link" onclick="volverDesdeOtp()" style="margin-bottom:1.5rem">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      Cambiar correo
+    </button>
+
+    <div class="card" style="text-align:center">
+      <div style="width:56px;height:56px;border-radius:16px;background:var(--pl);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;color:var(--p)">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18.01"/></svg>
+      </div>
+      <h3 style="font-size:1rem;font-weight:700;margin-bottom:.4rem">Código de verificación</h3>
+      <p style="font-size:12.5px;color:var(--s2);line-height:1.6;margin-bottom:.25rem">
+        Enviamos un código de 6 dígitos a
+      </p>
+      <p id="otp-email-display" style="font-size:13px;font-weight:700;color:var(--p);font-family:var(--m);margin-bottom:1.5rem"></p>
+
+      <div class="otp-wrap" id="otp-inputs">
+        <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" oninput="otpInput(this)" onkeydown="otpKeyDown(event,this)">
+        <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" oninput="otpInput(this)" onkeydown="otpKeyDown(event,this)">
+        <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" oninput="otpInput(this)" onkeydown="otpKeyDown(event,this)">
+        <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" oninput="otpInput(this)" onkeydown="otpKeyDown(event,this)">
+        <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" oninput="otpInput(this)" onkeydown="otpKeyDown(event,this)">
+        <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" oninput="otpInput(this)" onkeydown="otpKeyDown(event,this)">
+      </div>
+
+      <div id="otp-timer-wrap" style="margin-bottom:1rem">
+        <p class="otp-timer">Código válido por <strong id="otp-countdown">02:00</strong></p>
+      </div>
+      <div id="otp-resend-wrap" style="display:none;margin-bottom:1rem">
+        <button class="btn-resend" onclick="reenviarOtp()">Reenviar código</button>
+      </div>
+
+      <div id="otp-alert" class="alert" style="margin-bottom:.875rem;text-align:left"></div>
+
+      <button class="btn btn-primary" onclick="verificarOtp()" style="max-width:100%">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Verificar y acceder
+      </button>
+    </div>
   </div>
+</div>
 
-  <div class="card" style="padding:1.25rem">
-    <div class="tabs">
-      <button class="tab active" onclick="switchTab('proveedor-docs',this)">Empresa / Proveedor</button>
-      <button class="tab" onclick="switchTab('conductor-docs',this)">Conductor</button>
-      <button class="tab" onclick="switchTab('unidad-docs',this)">Unidad</button>
+<!-- ════════════════════════════════════════════════════════
+     PANTALLA 5 — DOCUMENTOS (proveedor autenticado)
+     ════════════════════════════════════════════════════════ -->
+<div id="screen-docs" class="screen">
+  <div class="wrap">
+    <!-- Banner bienvenida -->
+    <div id="docs-banner" class="existing-banner">
+      <div class="existing-banner-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+      </div>
+      <div>
+        <h3 id="docs-banner-name">Bienvenido</h3>
+        <p id="docs-banner-sub">Tu carpeta en SharePoint está lista</p>
+        <div style="margin-top:6px">
+          <div class="folder-path" id="docs-folder-path">2.Compras / TRANSPORTE 2026 / <span>categoría</span> / <span>analista</span> / <span>empresa</span></div>
+        </div>
+      </div>
     </div>
 
-    <div class="tab-panel active" id="proveedor-docs">
-      <div class="doc-grid" id="grid-proveedor"></div>
+    <!-- Info -->
+    <div class="info-card">
+      <div class="info-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12" y2="16"/></svg>
+      </div>
+      <div class="info-text">
+        <p>Sube los documentos requeridos</p>
+        <span>Los marcados con ★ son obligatorios para completar tu habilitación</span>
+      </div>
     </div>
-    <div class="tab-panel" id="conductor-docs">
+
+    <!-- Tabs de categoría -->
+    <div class="step-label"><div class="step-num">1</div><span>Documentos de empresa</span><div class="step-line"></div></div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+        Empresa / Proveedor
+        <div class="dot"></div>
+      </div>
+      <div class="doc-grid" id="docs-empresa"></div>
+    </div>
+
+    <div class="step-label"><div class="step-num">2</div><span>Conductores</span><div class="step-line"></div></div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Documentos de conductores
+        <div class="dot"></div>
+      </div>
       <div id="conductores-lista"></div>
-      <button onclick="addConductor()" style="
-        margin-top:10px;width:100%;padding:9px;
-        background:var(--pll);border:1.5px dashed var(--p3);
-        border-radius:var(--r12);cursor:pointer;
-        font-family:var(--f);font-size:13px;font-weight:600;
-        color:var(--p);display:flex;align-items:center;justify-content:center;gap:7px;
-        transition:all .15s;
-      " onmouseover="this.style.background='var(--pl)'" onmouseout="this.style.background='var(--pll)'">
+      <button onclick="addConductorEntry()" style="margin-top:8px;width:100%;padding:9px;background:var(--pll);border:1.5px dashed var(--p3);border-radius:var(--r12);cursor:pointer;font-family:var(--f);font-size:13px;font-weight:600;color:var(--p);display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s" onmouseover="this.style.background='var(--pl)'" onmouseout="this.style.background='var(--pll)'">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Agregar otro conductor
       </button>
     </div>
-    <div class="tab-panel" id="unidad-docs">
+
+    <div class="step-label"><div class="step-num">3</div><span>Unidades / Vehículos</span><div class="step-line"></div></div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h5l3 4v4h-8V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        Documentos de unidades
+        <div class="dot"></div>
+      </div>
       <div id="unidades-lista"></div>
-      <button onclick="addUnidad()" style="
-        margin-top:10px;width:100%;padding:9px;
-        background:var(--pll);border:1.5px dashed var(--p3);
-        border-radius:var(--r12);cursor:pointer;
-        font-family:var(--f);font-size:13px;font-weight:600;
-        color:var(--p);display:flex;align-items:center;justify-content:center;gap:7px;
-        transition:all .15s;
-      " onmouseover="this.style.background='var(--pl)'" onmouseout="this.style.background='var(--pll)'">
+      <button onclick="addUnidadEntry()" style="margin-top:8px;width:100%;padding:9px;background:var(--pll);border:1.5px dashed var(--p3);border-radius:var(--r12);cursor:pointer;font-family:var(--f);font-size:13px;font-weight:600;color:var(--p);display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s" onmouseover="this.style.background='var(--pl)'" onmouseout="this.style.background='var(--pll)'">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Agregar otra unidad
       </button>
     </div>
-  </div>
 
-  <!-- PASO 3 -->
-  <div class="step-label">
-    <div class="step-num">3</div>
-    <span>Observaciones</span>
-    <div class="step-line"></div>
-  </div>
-
-  <div class="card">
     <div class="field">
-      <label>Comentario adicional (opcional)</label>
-      <textarea id="obs" rows="3" placeholder="Ej: SOAT en trámite, adjunto constancia de pago..."></textarea>
+      <label>Observaciones adicionales</label>
+      <textarea id="doc-obs" placeholder="Comentarios o aclaraciones adicionales..."></textarea>
+    </div>
+
+    <div id="docs-alert" class="alert"></div>
+
+    <button class="btn btn-primary" id="btn-submit-docs" onclick="submitDocumentos()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Enviar documentos a SharePoint
+    </button>
+  </div>
+</div>
+
+<!-- ══ FOOTER ════════════════════════════════════════════ -->
+<!-- ══ DEMO HELPER ════════════════════════════════════════ -->
+<div id="demo-panel" style="
+  position:fixed;bottom:1.25rem;right:1.25rem;z-index:9999;
+  background:#1C0840;border:1.5px solid rgba(245,158,11,.5);border-radius:16px;
+  padding:1rem 1.25rem;max-width:270px;box-shadow:0 8px 32px rgba(0,0,0,.4);
+  font-family:'Outfit',sans-serif;
+">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+    <span style="font-size:12px;font-weight:700;color:#fde68a;letter-spacing:.06em;text-transform:uppercase">⚡ Modo Demo — TI</span>
+    <button onclick="document.getElementById('demo-panel').style.display='none'"
+      style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:16px;line-height:1;padding:0">×</button>
+  </div>
+  <div style="font-size:11.5px;color:rgba(255,255,255,.7);line-height:1.6;margin-bottom:.875rem">
+    Sin conexión a Power Automate.<br>Usa estos datos para la prueba:
+  </div>
+  <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:.875rem">
+    <div style="background:rgba(255,255,255,.07);border-radius:8px;padding:7px 10px">
+      <div style="font-size:10px;color:rgba(255,255,255,.4);font-weight:600;margin-bottom:2px">RUC de prueba</div>
+      <div style="font-size:13px;font-weight:700;color:#b4f06e;font-family:'JetBrains Mono',monospace;cursor:pointer"
+        onclick="copiarDemo('20100070970')" title="Clic para copiar">20100070970 📋</div>
+    </div>
+    <div style="background:rgba(255,255,255,.07);border-radius:8px;padding:7px 10px">
+      <div style="font-size:10px;color:rgba(255,255,255,.4);font-weight:600;margin-bottom:2px">Correo de prueba</div>
+      <div style="font-size:13px;font-weight:700;color:#b4f06e;font-family:'JetBrains Mono',monospace;cursor:pointer"
+        onclick="copiarDemo('demo@beta.pe')" title="Clic para copiar">demo@beta.pe 📋</div>
+    </div>
+    <div style="background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:7px 10px">
+      <div style="font-size:10px;color:rgba(245,158,11,.7);font-weight:600;margin-bottom:2px">Código OTP demo</div>
+      <div style="font-size:18px;font-weight:800;color:#fde68a;font-family:'JetBrains Mono',monospace;letter-spacing:.15em">123456</div>
+    </div>
+  </div>
+  <button onclick="rellenarDemoRapido()"
+    style="width:100%;padding:.55rem;background:linear-gradient(135deg,#5212A0,#5BAD1E);color:#fff;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer;transition:.15s"
+    onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+    🚀 Rellenar formulario automático
+  </button>
+  <div id="demo-copy-msg" style="font-size:10.5px;color:#b4f06e;text-align:center;margin-top:6px;min-height:14px"></div>
+</div>
+
+
+<!-- ══ PANTALLA ÉXITO ════════════════════════════════════ -->
+<div id="screen-success">
+  <div class="success-icon-wrap">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1C0840" stroke-width="2.5" stroke-linecap="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  </div>
+  <div class="success-title">¡Todo enviado<br><span>con éxito!</span> 🎉</div>
+  <div class="success-sub" id="success-sub">
+    Tus documentos llegaron a SharePoint y el analista ya fue notificado.<br>
+    <strong style="color:#b4f06e">¡Gracias por confiar en Complejo Agroindustrial Beta!</strong>
+  </div>
+  <div class="success-meta" id="success-meta">
+    📁 Carpeta creada correctamente<br>
+    👤 Analista notificado por correo<br>
+    ✅ Proceso completado
+  </div>
+  <div class="success-chips">
+    <span class="success-chip">✓ Documentos recibidos</span>
+    <span class="success-chip">✓ SharePoint actualizado</span>
+    <span class="success-chip">✓ Notificación enviada</span>
+  </div>
+  <button class="success-btn" onclick="cerrarExito()">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Volver al inicio
+  </button>
+  <div style="margin-top:1.5rem;font-size:10.5px;color:rgba(255,255,255,.3);font-family:var(--m)">
+    Desarrollado por Ing. Yazmin Atuncar · TI Beta
+  </div>
+</div>
+
+<footer>
+  <div style="display:flex;flex-direction:column;align-items:center;line-height:1;gap:3px">
+    <span style="font-family:'Outfit',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.03em;color:#fff">bet<span style="color:#79CC38">a</span></span>
+    <span style="font-family:'Outfit',sans-serif;font-size:8px;font-weight:500;letter-spacing:.08em;color:rgba(255,255,255,.35);text-transform:lowercase">complejo agroindustrial</span>
+  </div>
+
+  <div class="footer-dev">
+    <div class="footer-dev-avatar">YA</div>
+    <div class="footer-dev-info">
+      <div class="footer-dev-name">✦ Desarrollado por Ing. Yazmin Atuncar</div>
+      <div class="footer-dev-role">Área de Logística y Transporte · Complejo Agroindustrial Beta</div>
     </div>
   </div>
 
-  <!-- SUBMIT -->
-  <div class="btn-wrap">
-    <button class="btn-submit" id="btn-submit" onclick="submitForm()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
-      Enviar documentos — Complejo Agroindustrial Beta
-    </button>
-    <div class="alert" id="alert-box"></div>
-  </div>
-
-</div>
-
-<!-- FOOTER -->
-<footer>
-  <div class="footer-logo">
-    <div style="display:flex;flex-direction:column;line-height:1;gap:2px;">
-  <span style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:800;letter-spacing:-.03em;color:#fff;">bet<span style="color:#79CC38;">a</span></span>
-  <span style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:500;letter-spacing:.08em;color:rgba(255,255,255,.45);text-transform:lowercase;">complejo agroindustrial</span>
-</div>
-  </div>
-  <div class="footer-text">
-    <strong>Complejo Agroindustrial Beta</strong><br>
-    Portal de Documentos de Proveedores<br>
-    <span style="font-size:10px;color:rgba(255,255,255,.3);margin-top:4px;display:inline-block;">Desarrollado por Ing. Yazmin Atuncar</span>
-  </div>
+  <div class="footer-copy">Portal Proveedores v3.0 &nbsp;·&nbsp; Sistema de documentación digital</div>
 </footer>
 
 <script>
+/* ════════════════════════════════════════════════════════
+   CONFIGURACIÓN — pega tus URLs de Power Automate aquí
+   ════════════════════════════════════════════════════════ */
+const CFG = {
+  // Ruta base en SharePoint (biblioteca Documentos compartidos)
+  // Sitio: https://betacompe.sharepoint.com/sites/Intranet
+  // Ruta EXACTA decodificada de la URL de SharePoint
+  SITIO_SP: 'https://betacompe.sharepoint.com/sites/Intranet',
+  BIBLIOTECA: 'Documentos compartidos',
+  BASE_PATH: 'CADENA_DE_SUMINISTROS/2.Compras/TRANSPORTE 2026',
+  // Flujo: verificar si RUC existe en lista SharePoint
+  // Recibe: { ruc, email } — Devuelve: { existe: bool, razonSocial, carpeta, analista }
+  FLOW_VERIFICAR_RUC: 'PEGA_URL_FLOW_VERIFICAR_RUC_AQUI',
 
+  // Flujo: registrar nuevo proveedor + crear carpeta + enviar OTP
+  // Recibe: { ruc, razonSocial, email, contacto, analista, telefono, obs, ...archivos base64 }
+  FLOW_REGISTRAR: 'PEGA_URL_FLOW_REGISTRAR_AQUI',
 
-const DOCS={
-  proveedor:[
-    {id:'p01',name:'Contrato firmado',req:true},{id:'p02',name:'Ficha RUC',req:true},
-    {id:'p03',name:'Reporte Sentinel',req:true},{id:'p04',name:'Referencias comerciales',req:false},
-    {id:'p05',name:'Vigencia poder / DNI rep. legal',req:true},{id:'p06',name:'Brochure / carta presentación',req:false},
-    {id:'p07',name:'Lista Clinton',req:true},{id:'p08',name:'Carta conflictos de interés',req:true},
-    {id:'p09',name:'Carta de vinculación',req:true},{id:'p10',name:'Compromiso capacitación',req:true},
-    {id:'p11',name:'Compromiso control BUS',req:false},{id:'p12',name:'Deuda coactiva',req:true},
-    {id:'p13',name:'Carta compromiso tributario',req:true},{id:'p14',name:'Cotización',req:false},
-    {id:'p15',name:'Carta descanso transportista',req:false},{id:'p16',name:'Carta ETI',req:false},
-    {id:'p17',name:'Carta LAFT',req:false},
-  ],
-  conductor:[
-    {id:'c01',name:'DNI conductor',req:true},{id:'c02',name:'Licencia de conducir',req:true},
-    {id:'c03',name:'Récord MTC',req:true},{id:'c04',name:'SCTR — Seguro complementario',req:true},
-    {id:'c05',name:'Contrato de conductores',req:true},{id:'c06',name:'Antecedentes penales',req:true},
-    {id:'c07',name:'Antecedentes policiales',req:true},{id:'c08',name:'Antecedentes judiciales',req:true},
-    {id:'c09',name:'Foto del conductor',req:false},
-  ],
-  unidad:[
-    {id:'u01',name:'Tarjeta de propiedad',req:true},{id:'u02',name:'SOAT vigente',req:true},
-    {id:'u03',name:'Revisión técnica (RTV)',req:true},{id:'u04',name:'Tarjeta de circulación',req:true},
-    {id:'u05',name:'Póliza Beta / seguro',req:false},{id:'u06',name:'Boletín informativo',req:false},
-    {id:'u07',name:'Foto exterior unidad',req:false},{id:'u08',name:'Foto interior unidad',req:false},
-  ]
+  // Flujo: enviar OTP para login (proveedor ya registrado)
+  // Recibe: { ruc, email } — Genera OTP, lo guarda en lista, lo envía por correo
+  FLOW_ENVIAR_OTP: 'PEGA_URL_FLOW_ENVIAR_OTP_AQUI',
+
+  // Flujo: verificar OTP ingresado
+  // Recibe: { ruc, email, otp } — Devuelve: { valido: bool, razonSocial, carpeta, analista }
+  FLOW_VERIFICAR_OTP: 'PEGA_URL_FLOW_VERIFICAR_OTP_AQUI',
+
+  // Flujo: subir documentos a SharePoint
+  // Recibe: payload con archivos base64
+  FLOW_SUBIR_DOCS: 'PEGA_URL_FLOW_SUBIR_DOCS_AQUI',
+
+  // ¿Modo demo? (true = sin llamadas reales)
+  DEMO: true
 };
 
-const files={};
+/* ════════════════════════════════════════════════════════
+   ESTADO GLOBAL
+   ════════════════════════════════════════════════════════ */
+let SESSION = {
+  ruc: '', email: '', razonSocial: '',
+  carpeta: '', analista: '', modo: '' // 'nuevo' | 'existente'
+};
 
-const ICON=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>`;
-const CHECK=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+/* ════════════════════════════════════════════════════════
+   DEFINICIÓN DE DOCUMENTOS
+   ════════════════════════════════════════════════════════ */
+const DOCS_EMPRESA = [
+  { id:'p01', name:'Contrato firmado',              req:true  },
+  { id:'p02', name:'Ficha RUC',                     req:true  },
+  { id:'p03', name:'Reporte Sentinel',              req:true  },
+  { id:'p04', name:'Referencias comerciales',       req:false },
+  { id:'p05', name:'Vigencia poder / DNI rep. legal',req:true },
+  { id:'p06', name:'Brochure / carta presentación', req:false },
+  { id:'p07', name:'Lista Clinton',                 req:true  },
+  { id:'p08', name:'Carta conflictos de interés',   req:true  },
+  { id:'p09', name:'Carta de vinculación',          req:true  },
+  { id:'p10', name:'Compromiso capacitación',       req:true  },
+  { id:'p11', name:'Compromiso control BUS',        req:false },
+  { id:'p12', name:'Deuda coactiva',                req:true  },
+  { id:'p13', name:'Carta compromiso tributario',   req:true  },
+  { id:'p14', name:'Cotización',                    req:false },
+  { id:'p15', name:'Carta descanso transportista',  req:false },
+  { id:'p16', name:'Carta ETI',                     req:false },
+  { id:'p17', name:'Carta LAFT',                    req:false },
+];
+const DOCS_CONDUCTOR = [
+  { id:'c01', name:'DNI conductor',                req:true  },
+  { id:'c02', name:'Licencia de conducir',         req:true  },
+  { id:'c03', name:'Récord MTC',                   req:true  },
+  { id:'c04', name:'SCTR — Seguro complementario', req:true  },
+  { id:'c05', name:'Contrato de conductores',      req:true  },
+  { id:'c06', name:'Antecedentes penales',         req:true  },
+  { id:'c07', name:'Antecedentes policiales',      req:true  },
+  { id:'c08', name:'Antecedentes judiciales',      req:true  },
+  { id:'c09', name:'Foto del conductor',           req:false },
+];
+const DOCS_UNIDAD = [
+  { id:'u01', name:'Tarjeta de propiedad',     req:true  },
+  { id:'u02', name:'SOAT vigente',             req:true  },
+  { id:'u03', name:'Revisión técnica (RTV)',   req:true  },
+  { id:'u04', name:'Tarjeta de circulación',   req:true  },
+  { id:'u05', name:'Póliza Beta / seguro',     req:false },
+  { id:'u06', name:'Boletín informativo',      req:false },
+  { id:'u07', name:'Foto exterior unidad',     req:false },
+  { id:'u08', name:'Foto interior unidad',     req:false },
+];
 
-function buildGrid(cat,cid){
-  const el=document.getElementById(cid);
-  el.innerHTML='';
-  DOCS[cat].forEach(doc=>{
-    const d=document.createElement('div');
-    d.className='doc-item'; d.id='item-'+doc.id;
-    d.innerHTML=`
-      <input type="file" accept=".pdf,.jpg,.jpeg,.png,.docx" onchange="pick('${doc.id}',this)" title="${doc.name}">
+// Archivos registros iniciales (presentación)
+const DOCS_REGISTRO = [
+  { id:'reg_brochure',  name:'Brochure / Presentación', req:false },
+  { id:'reg_cotizacion',name:'Cotización',              req:false },
+  { id:'reg_ficha',     name:'Ficha técnica',           req:false },
+  { id:'reg_carta',     name:'Carta de presentación',   req:false },
+  { id:'reg_otro',      name:'Otro documento',          req:false },
+];
+
+const fileStore = {}; // docId → File
+
+/* Actualiza la barra de progreso según archivos cargados */
+function updateProgress() {
+  // Contar todos los docs requeridos en pantalla actual
+  const reqEmpresa = DOCS_EMPRESA.filter(d => d.req).length;
+  // Contar entradas de conductor y unidad activas
+  let reqCond = 0, reqUnid = 0;
+  for (let i = 1; i <= condEntryCount; i++) {
+    if (document.getElementById('cond-entry-' + i)) reqCond += DOCS_CONDUCTOR.filter(d => d.req).length;
+  }
+  for (let i = 1; i <= unidEntryCount; i++) {
+    if (document.getElementById('unid-entry-' + i)) reqUnid += DOCS_UNIDAD.filter(d => d.req).length;
+  }
+  const totalReq = reqEmpresa + reqCond + reqUnid;
+
+  // Contar archivos cargados (todos, no solo requeridos)
+  const loaded = Object.keys(fileStore).length;
+
+  // Para la barra usamos: archivos cargados vs total de slots (requeridos + opcionales visibles)
+  const totalSlots = DOCS_EMPRESA.length
+    + condEntryCount * DOCS_CONDUCTOR.length
+    + unidEntryCount * DOCS_UNIDAD.length;
+
+  const pct = totalSlots > 0 ? Math.round(loaded / totalSlots * 100) : 0;
+
+  const fill  = document.getElementById('prog-fill');
+  const count = document.getElementById('prog-count');
+  if (fill)  fill.style.width = pct + '%';
+  if (count) count.textContent = loaded + ' / ' + totalSlots + ' archivos';
+}
+
+/* ════════════════════════════════════════════════════════
+   NAVEGACIÓN
+   ════════════════════════════════════════════════════════ */
+function irA(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  document.getElementById('prog-bar-wrap').style.display = screenId === 'screen-docs' ? 'block' : 'none';
+  if (screenId === 'screen-docs') setTimeout(updateProgress, 100);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function volverDesdeOtp() {
+  irA(SESSION.modo === 'nuevo' ? 'screen-registro' : 'screen-login');
+}
+
+function cerrarSesion() {
+  SESSION = { ruc:'', email:'', razonSocial:'', carpeta:'', analista:'', modo:'' };
+  document.getElementById('nav-session').style.display = 'none';
+  irA('screen-entry');
+}
+
+/* ════════════════════════════════════════════════════════
+   RENDER GRIDS DE DOCUMENTOS
+   ════════════════════════════════════════════════════════ */
+function renderDocGrid(containerId, docs) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  docs.forEach(doc => {
+    const div = document.createElement('div');
+    div.className = 'doc-item';
+    div.id = 'doc-item-' + doc.id;
+    div.innerHTML = `
+      <input type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" onchange="onFileChange('${doc.id}', this)">
       <div class="doc-face">
-        <div class="doc-icon" id="icon-${doc.id}">${ICON}</div>
+        <div class="doc-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
         <div class="doc-name">${doc.name}</div>
-        <div class="doc-status" id="st-${doc.id}">Sin archivo</div>
+        <div class="doc-status" id="doc-status-${doc.id}">Sin archivo</div>
       </div>
-      ${doc.req?'<span class="doc-req-tag">obligatorio</span>':''}`;
-    el.appendChild(d);
+      ${doc.req ? '<div class="doc-req-tag">★ req</div>' : ''}
+    `;
+    container.appendChild(div);
   });
 }
-buildGrid('proveedor','grid-proveedor');
 
-// ── Multi conductor / unidad ──────────────────
-let condCount = 0;
-let unidCount = 0;
+function onFileChange(docId, input) {
+  const file = input.files[0];
+  const item = document.getElementById('doc-item-' + docId);
+  const status = document.getElementById('doc-status-' + docId);
+  if (file) {
+    fileStore[docId] = file;
+    item.classList.add('has-file');
+    item.classList.remove('required-missing');
+    status.textContent = file.name.length > 22 ? file.name.slice(0,20) + '…' : file.name;
+  } else {
+    delete fileStore[docId];
+    item.classList.remove('has-file');
+    status.textContent = 'Sin archivo';
+  }
+  updateProgress();
+}
 
-function makeEntry(type, idx, docs) {
-  const prefix = type === 'cond' ? 'c' : 'u';
-  const labelField = type === 'cond'
-    ? `<label>DNI / Nombre del conductor #${idx}</label>
-       <input type="text" id="${type}-nombre-${idx}" placeholder="Ej: SANDOVAL SUCLUPE ELMER — 42444013"
-         style="font-family:var(--f);font-size:13.5px;color:var(--s1);background:var(--pll);border:1.5px solid var(--s4);border-radius:var(--r8);padding:.55rem .875rem;width:100%;outline:none;margin-bottom:.875rem;">`
-    : `<label>Placa de la unidad #${idx}</label>
-       <input type="text" id="${type}-placa-${idx}" placeholder="Ej: M4M966" style="text-transform:uppercase;font-family:var(--f);font-size:13.5px;color:var(--s1);background:var(--pll);border:1.5px solid var(--s4);border-radius:var(--r8);padding:.55rem .875rem;width:100%;outline:none;margin-bottom:.875rem;">`;
+// Inicializar grids cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', () => {
+  renderDocGrid('reg-docs-grid', DOCS_REGISTRO);
+  renderDocGrid('docs-empresa', DOCS_EMPRESA);
+  // conductor/unidad handled by multi-entry system
+});
 
+/* ════════════════════════════════════════════════════════
+   SUNAT — AUTOCOMPLETE RUC
+   ════════════════════════════════════════════════════════ */
+let rucTimer = null;
+
+function buscarRucManual() {
+  const val = document.getElementById('reg-ruc').value.replace(/\D/g,'').slice(0,11);
+  if (val.length === 11) { clearTimeout(rucTimer); buscarRuc(val); }
+  else setRucState('error','Escribe los 11 dígitos del RUC primero');
+}
+
+function onRucInput(val) {
+  const clean = val.replace(/\D/g,'').slice(0,11);
+  document.getElementById('reg-ruc').value = clean;
+  clearTimeout(rucTimer);
+  setRucState('idle');
+  if (clean.length === 11) rucTimer = setTimeout(() => buscarRuc(clean), 600);
+  else clearSunatData();
+}
+
+function setRucState(state, msg) {
+  const spinner = document.getElementById('ruc-spinner');
+  const ok = document.getElementById('ruc-ok');
+  const err = document.getElementById('ruc-err');
+  const hint = document.getElementById('ruc-hint');
+  spinner.style.display = ok.style.display = err.style.display = 'none';
+  if (state === 'loading') { spinner.style.display = 'block'; hint.textContent = 'Consultando SUNAT...'; hint.className = 'hint'; }
+  else if (state === 'ok') { ok.style.display = 'block'; hint.textContent = msg || '✓ Datos cargados'; hint.className = 'hint ok'; }
+  else if (state === 'error') { err.style.display = 'block'; hint.textContent = msg || 'RUC no encontrado'; hint.className = 'hint err'; }
+  else { hint.textContent = 'Ingresa 11 dígitos — se completará automáticamente'; hint.className = 'hint'; }
+}
+
+function clearSunatData() {
+  const r = document.getElementById('reg-razon');
+  r.value = ''; r.readOnly = true;
+  document.getElementById('sunat-extra').style.display = 'none';
+  ['sunat-estado','sunat-condicion','sunat-direccion'].forEach(id => document.getElementById(id).value = '');
+}
+
+function fillSunatData(data) {
+  const r = document.getElementById('reg-razon');
+  r.value = data.razonSocial || data.nombre || '';
+  r.readOnly = false; r.style.background = 'var(--gl)';
+  document.getElementById('sunat-estado').value = data.estado || '';
+  document.getElementById('sunat-condicion').value = data.condicion || '';
+  document.getElementById('sunat-direccion').value = data.direccion || data.domicilioFiscal || '';
+  document.getElementById('sunat-extra').style.display = 'block';
+  if (!document.getElementById('reg-contacto').value && (data.representanteLegal || data.nombreComercial))
+    document.getElementById('reg-contacto').value = data.representanteLegal || data.nombreComercial || '';
+  setRucState('ok', `✓ ${r.value}`);
+}
+
+async function buscarRuc(ruc) {
+  setRucState('loading');
+  try {
+    const r = await fetch(`https://api.apis.net.pe/v1/ruc?numero=${ruc}`, { headers: { 'Authorization': 'Bearer apis-token-demo' } });
+    if (r.ok) { const d = await r.json(); if (d && (d.razonSocial || d.nombre)) { fillSunatData(d); return; } }
+  } catch(e) {}
+  try {
+    const r2 = await fetch(`https://api.apis.net.pe/v2/sunat/ruc?numero=${ruc}`, { headers: { 'Authorization': 'Bearer apis-token-demo' } });
+    if (r2.ok) { const d2 = await r2.json(); if (d2 && (d2.razonSocial || d2.nombre)) { fillSunatData(d2); return; } }
+  } catch(e) {}
+  setRucState('error', 'No se pudo consultar SUNAT — ingresa la razón social manualmente');
+  const r = document.getElementById('reg-razon');
+  r.readOnly = false; r.style.background = 'var(--pll)';
+  r.placeholder = 'Ingresa la razón social manualmente'; r.focus();
+}
+
+/* ════════════════════════════════════════════════════════
+   OTP — INPUTS
+   ════════════════════════════════════════════════════════ */
+function otpInput(el) {
+  el.value = el.value.replace(/\D/g,'');
+  el.classList.toggle('filled', el.value.length === 1);
+  if (el.value.length === 1) {
+    const next = el.nextElementSibling;
+    if (next && next.classList.contains('otp-digit')) next.focus();
+    else checkOtpComplete();
+  }
+}
+
+function otpKeyDown(e, el) {
+  if (e.key === 'Backspace' && !el.value) {
+    const prev = el.previousElementSibling;
+    if (prev && prev.classList.contains('otp-digit')) { prev.value = ''; prev.classList.remove('filled'); prev.focus(); }
+  }
+}
+
+function getOtpValue() {
+  return [...document.querySelectorAll('.otp-digit')].map(i => i.value).join('');
+}
+
+function checkOtpComplete() {
+  if (getOtpValue().length === 6) verificarOtp();
+}
+
+function clearOtp() {
+  document.querySelectorAll('.otp-digit').forEach(i => { i.value = ''; i.classList.remove('filled'); });
+  document.querySelector('.otp-digit').focus();
+}
+
+/* ════════════════════════════════════════════════════════
+   COUNTDOWN OTP
+   ════════════════════════════════════════════════════════ */
+let otpInterval = null;
+let otpSeconds = 120;
+
+function startOtpCountdown() {
+  clearInterval(otpInterval);
+  otpSeconds = 120;
+  document.getElementById('otp-timer-wrap').style.display = 'block';
+  document.getElementById('otp-resend-wrap').style.display = 'none';
+  updateOtpDisplay();
+  otpInterval = setInterval(() => {
+    otpSeconds--;
+    updateOtpDisplay();
+    if (otpSeconds <= 0) {
+      clearInterval(otpInterval);
+      document.getElementById('otp-timer-wrap').style.display = 'none';
+      document.getElementById('otp-resend-wrap').style.display = 'block';
+    }
+  }, 1000);
+}
+
+function updateOtpDisplay() {
+  const m = String(Math.floor(otpSeconds / 60)).padStart(2,'0');
+  const s = String(otpSeconds % 60).padStart(2,'0');
+  document.getElementById('otp-countdown').textContent = `${m}:${s}`;
+}
+
+/* ════════════════════════════════════════════════════════
+   ALERTAS
+   ════════════════════════════════════════════════════════ */
+function showAlert(id, type, msg) {
+  const box = document.getElementById(id);
+  const ico = type === 'success'
+    ? '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
+    : type === 'error'
+    ? '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+    : type === 'warning'
+    ? '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12" y2="17"/></svg>'
+    : '<div class="spin"></div>';
+  box.className = 'alert ' + type;
+  box.innerHTML = ico + '<span style="white-space:pre-line">' + msg + '</span>';
+  box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function hideAlert(id) {
+  document.getElementById(id).className = 'alert';
+}
+
+/* ════════════════════════════════════════════════════════
+   HELPER — LLAMADA A POWER AUTOMATE
+   ════════════════════════════════════════════════════════ */
+async function callFlow(url, payload) {
+  if (CFG.DEMO) {
+    await new Promise(r => setTimeout(r, 900));
+    return { ok: true, demo: true };
+  }
+  const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+  if (!res.ok) throw new Error('Error en el flujo: ' + res.statusText);
+  try { return await res.json(); } catch { return { ok: true }; }
+}
+
+async function toBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+/* ════════════════════════════════════════════════════════
+   FLUJO — REGISTRO NUEVO
+   ════════════════════════════════════════════════════════ */
+async function submitRegistro() {
+  const ruc      = document.getElementById('reg-ruc').value.trim();
+  const razon    = document.getElementById('reg-razon').value.trim();
+  const email    = document.getElementById('reg-email').value.trim();
+  const contacto = document.getElementById('reg-contacto').value.trim();
+  const analista = document.getElementById('reg-analista').value;
+  const telefono = document.getElementById('reg-telefono').value.trim();
+  const obs      = document.getElementById('reg-obs').value.trim();
+
+  if (!ruc || ruc.length !== 11)   return showAlert('reg-alert','error','Ingresa un RUC válido de 11 dígitos.');
+  if (!razon)   return showAlert('reg-alert','error','La razón social es requerida.');
+  if (!email)   return showAlert('reg-alert','error','El correo es requerido para el código de verificación.');
+  if (!contacto) return showAlert('reg-alert','error','El nombre de contacto es requerido.');
+  const cat = document.getElementById('reg-categoria').value;
+  if (!cat) return showAlert('reg-alert','error','Selecciona la categoría de transporte.');
+  if (!analista) return showAlert('reg-alert','error','Selecciona el analista responsable.');
+
+  showAlert('reg-alert','loading','Registrando empresa y generando código de verificación...');
+
+  try {
+    // Preparar archivos adjuntos
+    const archivos = [];
+    for (const [docId, file] of Object.entries(fileStore)) {
+      if (DOCS_REGISTRO.find(d => d.id === docId)) {
+        const b64 = await toBase64(file);
+        archivos.push({ id: docId, nombre: file.name, tipo: file.type || 'application/octet-stream', contenido: b64 });
+      }
+    }
+
+    const payload = { ruc, razonSocial: razon, email, contacto, analista, categoria: cat, telefono, obs, archivos,
+      ruta_carpeta: `${CFG.BASE_PATH}/${cat}/${analista}/${razon}`,
+      subcarpetas: ['Proveedor','Conductor','Unidad'] };
+
+    const result = await callFlow(CFG.FLOW_REGISTRAR, payload);
+
+    // Demo: simular OTP enviado
+    SESSION = { ruc, email, razonSocial: razon, categoria: cat, carpeta: `${CFG.BASE_PATH}/${cat}/${analista}/${razon}`, analista, modo: 'nuevo' };
+
+    hideAlert('reg-alert');
+    mostrarOtp(email);
+
+  } catch(e) {
+    showAlert('reg-alert','error','Error al registrar: ' + e.message);
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   FLUJO — LOGIN (proveedor existente)
+   ════════════════════════════════════════════════════════ */
+async function solicitarOtpLogin() {
+  const ruc   = document.getElementById('login-ruc').value.replace(/\D/g,'').slice(0,11);
+  const email = document.getElementById('login-email').value.trim();
+
+  if (ruc.length !== 11) return showAlert('login-alert','error','Ingresa el RUC de 11 dígitos.');
+  if (!email) return showAlert('login-alert','error','Ingresa tu correo electrónico registrado.');
+
+  showAlert('login-alert','loading','Verificando RUC y enviando código...');
+
+  try {
+    const result = await callFlow(CFG.FLOW_ENVIAR_OTP, { ruc, email });
+
+    if (CFG.DEMO) {
+      // En demo simulamos que el RUC existe
+      SESSION = { ruc, email,
+        razonSocial: 'EMPRESA DEMO S.A.C.',
+        categoria: 'TRANSPORTE DE SERVICIOS NORTE Y SUR',
+        carpeta: `CADENA_DE_SUMINISTROS/2.Compras/TRANSPORTE 2026/TRANSPORTE DE SERVICIOS NORTE Y SUR/CREGALADO/EMPRESA DEMO S.A.C.`,
+        analista: 'CREGALADO', modo: 'existente'
+      };
+    } else {
+      if (!result.existe) {
+        return showAlert('login-alert','warning',
+          'RUC no encontrado en nuestro sistema.\n¿Es tu primera vez? Usa "Registrarme como proveedor".');
+      }
+      SESSION = { ruc, email, razonSocial: result.razonSocial || '', carpeta: result.carpeta || '',
+        analista: result.analista || '', modo: 'existente' };
+    }
+
+    hideAlert('login-alert');
+    mostrarOtp(email);
+
+  } catch(e) {
+    showAlert('login-alert','error','Error: ' + e.message);
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   MOSTRAR PANTALLA OTP
+   ════════════════════════════════════════════════════════ */
+function mostrarOtp(email) {
+  document.getElementById('otp-email-display').textContent = email;
+  clearOtp();
+  hideAlert('otp-alert');
+  startOtpCountdown();
+  irA('screen-otp');
+  // Demo: mostrar código en consola
+  if (CFG.DEMO) {
+    console.info('%c[DEMO] Código OTP simulado: 123456', 'color:#5212A0;font-weight:bold;font-size:14px');
+    setTimeout(() => showAlert('otp-alert','warning','MODO DEMO: Usa el código 123456'), 400);
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   DEMO HELPERS — para prueba sin Power Automate
+   ════════════════════════════════════════════════════════ */
+function copiarDemo(texto) {
+  navigator.clipboard.writeText(texto).catch(()=>{});
+  const msg = document.getElementById('demo-copy-msg');
+  msg.textContent = '✓ "' + texto + '" copiado';
+  setTimeout(() => msg.textContent = '', 2000);
+}
+
+function rellenarDemoRapido() {
+  const screen = document.querySelector('.screen.active');
+  if (!screen) return;
+  const id = screen.id;
+
+  if (id === 'screen-entry') {
+    irA('screen-registro');
+    setTimeout(rellenarDemoRapido, 350);
+    return;
+  }
+
+  if (id === 'screen-registro') {
+    // Rellenar RUC y datos SUNAT mock
+    const rucEl = document.getElementById('reg-ruc');
+    rucEl.value = '20100070970';
+    fillSunatData({
+      razonSocial: 'TRANSPORTES DEL NORTE SAC',
+      estado: 'ACTIVO',
+      condicion: 'HABIDO',
+      direccion: 'AV. INDUSTRIALES 456, ICA'
+    });
+    document.getElementById('reg-contacto').value = 'Carlos Mendoza Ríos';
+    document.getElementById('reg-email').value = 'demo@beta.pe';
+    document.getElementById('reg-telefono').value = '+51 987 654 321';
+    document.getElementById('reg-categoria').value = 'TRANSPORTE DE SERVICIOS NORTE Y SUR';
+    document.getElementById('reg-analista').value = 'CREGALADO';
+    document.getElementById('reg-obs').value = 'Flota de 12 unidades disponibles — rutas norte y sur.';
+    const msg = document.getElementById('demo-copy-msg');
+    msg.textContent = '✓ Formulario rellenado — revisa y presiona Registrarme';
+    setTimeout(() => msg.textContent = '', 3000);
+    return;
+  }
+
+  if (id === 'screen-login') {
+    document.getElementById('login-ruc').value = '20100070970';
+    document.getElementById('login-email').value = 'demo@beta.pe';
+    const msg = document.getElementById('demo-copy-msg');
+    msg.textContent = '✓ Datos de login rellenados';
+    setTimeout(() => msg.textContent = '', 2500);
+    return;
+  }
+
+  if (id === 'screen-otp') {
+    const digits = document.querySelectorAll('.otp-digit');
+    const code = '123456';
+    digits.forEach((d, i) => {
+      d.value = code[i];
+      d.classList.add('filled');
+    });
+    const msg = document.getElementById('demo-copy-msg');
+    msg.textContent = '✓ OTP 123456 ingresado — verifica';
+    setTimeout(() => msg.textContent = '', 2500);
+    return;
+  }
+
+  const msg = document.getElementById('demo-copy-msg');
+  msg.textContent = 'Navega a un formulario primero';
+  setTimeout(() => msg.textContent = '', 2000);
+}
+
+// Mostrar/ocultar badge DEMO según CFG
+if (!CFG.DEMO) {
+  const badge = document.getElementById('demo-badge');
+  if (badge) badge.style.display = 'none';
+  const panel = document.getElementById('demo-panel');
+  if (panel) panel.style.display = 'none';
+}
+
+/* ════════════════════════════════════════════════════════
+   REENVIAR OTP
+   ════════════════════════════════════════════════════════ */
+async function reenviarOtp() {
+  showAlert('otp-alert','loading','Reenviando código...');
+  try {
+    if (CFG.DEMO) {
+      await new Promise(r => setTimeout(r, 800));
+      startOtpCountdown();
+      showAlert('otp-alert','warning','MODO DEMO: El nuevo código sigue siendo 123456');
+    } else {
+      await callFlow(CFG.FLOW_ENVIAR_OTP, { ruc: SESSION.ruc, email: SESSION.email });
+      startOtpCountdown();
+      showAlert('otp-alert','success','Código reenviado a ' + SESSION.email);
+    }
+  } catch(e) {
+    showAlert('otp-alert','error','No se pudo reenviar: ' + e.message);
+  }
+}
+
+async function verificarOtp() {
+  const otp = getOtpValue();
+  if (otp.length !== 6) return showAlert('otp-alert','error','Ingresa el código completo de 6 dígitos.');
+
+  showAlert('otp-alert','loading','Verificando código...');
+
+  try {
+    let valido = false;
+
+    if (CFG.DEMO) {
+      await new Promise(r => setTimeout(r, 800));
+      valido = otp === '123456';
+    } else {
+      const result = await callFlow(CFG.FLOW_VERIFICAR_OTP, { ruc: SESSION.ruc, email: SESSION.email, otp });
+      valido = result.valido;
+      if (valido && result.razonSocial) SESSION.razonSocial = result.razonSocial;
+      if (valido && result.carpeta)     SESSION.carpeta     = result.carpeta;
+      if (valido && result.analista)    SESSION.analista    = result.analista;
+    }
+
+    if (!valido) {
+      showAlert('otp-alert','error','Código incorrecto o expirado. Inténtalo de nuevo.');
+      clearOtp();
+      return;
+    }
+
+    clearInterval(otpInterval);
+    hideAlert('otp-alert');
+    accederDocumentos();
+
+  } catch(e) {
+    showAlert('otp-alert','error','Error al verificar: ' + e.message);
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   ACCEDER A PANTALLA DE DOCUMENTOS
+   ════════════════════════════════════════════════════════ */
+function accederDocumentos() {
+  // Navbar sesión
+  document.getElementById('nav-session').style.display = 'flex';
+  document.getElementById('nav-name').textContent = SESSION.razonSocial || SESSION.ruc;
+  document.getElementById('nav-avatar').textContent = (SESSION.razonSocial || SESSION.ruc).charAt(0).toUpperCase();
+
+  // Banner
+  document.getElementById('docs-banner-name').textContent = `¡Bienvenido, ${SESSION.razonSocial || SESSION.ruc}!`;
+  document.getElementById('docs-banner-sub').textContent =
+    SESSION.modo === 'nuevo' ? 'Tu carpeta en SharePoint fue creada exitosamente' : 'Tu carpeta en SharePoint está activa';
+  document.getElementById('docs-folder-path').innerHTML =
+    `Docs / CADENA_DE_SUMINISTROS / 2.Compras / TRANSPORTE 2026 / <span>${SESSION.categoria||''}</span> / <span>${SESSION.analista}</span> / <span>${SESSION.razonSocial || SESSION.ruc}</span>`;
+
+  // Limpiar archivos anteriores
+  Object.keys(fileStore).forEach(k => delete fileStore[k]);
+  renderDocGrid('docs-empresa', DOCS_EMPRESA);
+  // Reset multi-entry conductor/unidad
+  condEntryCount = 0; unidEntryCount = 0;
+  document.getElementById('conductores-lista').innerHTML = '';
+  document.getElementById('unidades-lista').innerHTML = '';
+  addConductorEntry();
+  addUnidadEntry();
+
+  irA('screen-docs');
+}
+
+/* ════════════════════════════════════════════════════════
+   MULTI CONDUCTOR / UNIDAD
+   ════════════════════════════════════════════════════════ */
+let condEntryCount = 0;
+let unidEntryCount = 0;
+
+const DOC_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>`;
+const DOC_CHECK = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+function makeEntryBlock(type, idx, docs) {
   const div = document.createElement('div');
   div.id = `${type}-entry-${idx}`;
   div.style.cssText = 'background:var(--pll);border:1px solid var(--s4);border-radius:var(--r12);padding:1rem;margin-bottom:.75rem;position:relative;';
+
+  const isCond = type === 'cond';
+  const label = isCond ? `Conductor #${idx}` : `Unidad #${idx}`;
+  const removeBtn = idx > 1 ? `<button onclick="removeEntryBlock('${type}','${idx}')" style="background:none;border:1px solid var(--s4);cursor:pointer;color:var(--s3);font-size:11px;font-family:var(--f);font-weight:600;padding:2px 10px;border-radius:6px;">✕ Quitar</button>` : '';
+
+  let fields = '';
+  if (isCond) {
+    fields = `
+      <div class="g2" style="margin-bottom:.875rem">
+        <div class="field">
+          <label>Nombre del conductor</label>
+          <input type="text" id="cond-nombre-${idx}" placeholder="Ej: SANDOVAL SUCLUPE ELMER">
+        </div>
+        <div class="field">
+          <label>Correo electrónico</label>
+          <input type="email" id="cond-email-${idx}" placeholder="conductor@empresa.com">
+        </div>
+      </div>`;
+  } else {
+    fields = `
+      <div class="field" style="margin-bottom:.875rem">
+        <label>Placa del vehículo</label>
+        <input type="text" id="unid-placa-${idx}" placeholder="Ej: M4M-966" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+      </div>`;
+  }
+
   div.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;">
-      <span style="font-size:11px;font-weight:700;color:var(--p);letter-spacing:.06em;text-transform:uppercase;">
-        ${type === 'cond' ? 'Conductor' : 'Unidad'} #${idx}
-      </span>
-      ${idx > 1 ? `<button onclick="removeEntry('${type}','${idx}')" style="background:none;border:none;cursor:pointer;color:var(--s3);font-size:11px;font-family:var(--f);font-weight:600;padding:2px 8px;border-radius:6px;border:1px solid var(--s4);">✕ Quitar</button>` : ''}
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+      <span style="font-size:11px;font-weight:700;color:var(--p);letter-spacing:.06em;text-transform:uppercase">${label}</span>
+      ${removeBtn}
     </div>
-    <div class="field">${labelField}</div>
+    ${fields}
     <div class="doc-grid" id="grid-${type}-${idx}" style="grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:7px;"></div>
   `;
   return div;
 }
 
-function buildEntryGrid(type, idx) {
-  const cat = type === 'cond' ? 'conductor' : 'unidad';
+function buildEntryDocGrid(type, idx, docs) {
   const container = document.getElementById(`grid-${type}-${idx}`);
   if (!container) return;
   container.innerHTML = '';
-  DOCS[cat].forEach(doc => {
+  docs.forEach(doc => {
     const uid = `${type}${idx}_${doc.id}`;
     const d = document.createElement('div');
-    d.className = 'doc-item'; d.id = 'item-' + uid;
+    d.className = 'doc-item'; d.id = 'docitem-' + uid;
     d.innerHTML = `
-      <input type="file" accept=".pdf,.jpg,.jpeg,.png,.docx" onchange="pick('${uid}',this)" title="${doc.name}">
+      <input type="file" accept=".pdf,.jpg,.jpeg,.png,.docx" onchange="pickEntry('${uid}',this)" title="${doc.name}">
       <div class="doc-face">
-        <div class="doc-icon" id="icon-${uid}">${ICON}</div>
+        <div class="doc-icon" id="eicon-${uid}">${DOC_ICON}</div>
         <div class="doc-name">${doc.name}</div>
-        <div class="doc-status" id="st-${uid}">Sin archivo</div>
+        <div class="doc-status" id="est-${uid}">Sin archivo</div>
       </div>
-      ${doc.req ? '<span class="doc-req-tag">obligatorio</span>' : ''}`;
+      ${doc.req ? '<span class="doc-req-tag">★ req</span>' : ''}`;
     container.appendChild(d);
   });
 }
 
-function addConductor() {
-  condCount++;
+function addConductorEntry() {
+  condEntryCount++;
   const lista = document.getElementById('conductores-lista');
-  lista.appendChild(makeEntry('cond', condCount, DOCS.conductor));
-  buildEntryGrid('cond', condCount);
-  updateProg();
+  lista.appendChild(makeEntryBlock('cond', condEntryCount, DOCS_CONDUCTOR));
+  buildEntryDocGrid('cond', condEntryCount, DOCS_CONDUCTOR);
+  updateProgress();
 }
 
-function addUnidad() {
-  unidCount++;
+function addUnidadEntry() {
+  unidEntryCount++;
   const lista = document.getElementById('unidades-lista');
-  lista.appendChild(makeEntry('unid', unidCount, DOCS.unidad));
-  buildEntryGrid('unid', unidCount);
-  updateProg();
+  lista.appendChild(makeEntryBlock('unid', unidEntryCount, DOCS_UNIDAD));
+  buildEntryDocGrid('unid', unidEntryCount, DOCS_UNIDAD);
+  updateProgress();
 }
 
-function removeEntry(type, idx) {
+function removeEntryBlock(type, idx) {
   const el = document.getElementById(`${type}-entry-${idx}`);
   if (el) {
-    // Remove files from this entry
-    Object.keys(files).filter(k => k.startsWith(`${type}${idx}_`)).forEach(k => delete files[k]);
+    Object.keys(fileStore).filter(k => k.startsWith(`${type}${idx}_`)).forEach(k => delete fileStore[k]);
     el.remove();
-    updateProg();
+    updateProgress();
   }
 }
 
-// Init: one conductor, one unidad by default
-addConductor();
-addUnidad();
-
-function pick(id,inp){
-  const f=inp.files[0]; if(!f) return;
-  files[id]=f;
-  document.getElementById('item-'+id).classList.add('has-file');
-  document.getElementById('item-'+id).classList.remove('required-missing');
-  document.getElementById('icon-'+id).innerHTML=CHECK;
-  const n=f.name.length>22?f.name.slice(0,19)+'...':f.name;
-  document.getElementById('st-'+id).textContent=n;
-  updateProg();
+function pickEntry(uid, input) {
+  const file = input.files[0];
+  if (!file) return;
+  fileStore[uid] = file;
+  const item = document.getElementById('docitem-' + uid);
+  const icon = document.getElementById('eicon-' + uid);
+  const status = document.getElementById('est-' + uid);
+  if (item) item.classList.add('has-file');
+  if (icon) icon.innerHTML = DOC_CHECK;
+  if (status) status.textContent = file.name.length > 22 ? file.name.slice(0,20) + '…' : file.name;
+  updateProgress();
 }
 
-function updateProg(){
-  const all=[...DOCS.proveedor,...DOCS.conductor,...DOCS.unidad];
-  const done=Object.keys(files).length, total=all.length;
-  document.getElementById('prog-count').textContent=done+' / '+total;
-  document.getElementById('prog-fill').style.width=(done/total*100)+'%';
-}
-updateProg();
-
-function switchTab(pid,btn){
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-  document.getElementById(pid).classList.add('active');
-  btn.classList.add('active');
-}
-
-function validate(){
-  const prov=document.getElementById('proveedor').value.trim();
-  const ana=document.getElementById('analista').value;
-  if(!prov){showAlert('error','Ingresa el nombre del proveedor.');return false;}
-  if(!ana){showAlert('error','Selecciona el analista responsable.');return false;}
-  const miss=DOCS.proveedor.filter(d=>d.req&&!files[d.id]);
-  if(miss.length){
-    miss.forEach(d=>document.getElementById('item-'+d.id).classList.add('required-missing'));
-    document.querySelectorAll('.tab')[0].click();
-    showAlert('error','Faltan '+miss.length+' documento(s) obligatorio(s): '+miss.map(d=>d.name).slice(0,3).join(', ')+(miss.length>3?'...':'')+'.');
-    return false;
-  }
-  return true;
-}
-
-/* ══════════════════════════════════════════════════════
-   CONFIGURACIÓN POWER AUTOMATE
-   1. En Power Automate crea un flujo "Cuando se recibe
-      una solicitud HTTP"
-   2. Pega la URL del trigger en FLOW_URL abajo
-   3. Configura el flujo para guardar en SharePoint
-      (ver instrucciones en el README adjunto)
-══════════════════════════════════════════════════════ */
-const FLOW_URL = 'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/211f4b80b9df4cb89b5773de8ad441e3/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=8pPwrbEN53Zna3weX1m3kkk-jsYWFZ0yYYsrjRtAPz4';
-
-async function submitForm(){
-  if(!validate()) return;
-  const btn=document.getElementById('btn-submit');
-  btn.disabled=true;
-
-  const prov    = document.getElementById('proveedor').value.trim();
-  const ana     = document.getElementById('analista').value;
-  const ruc     = document.getElementById('ruc').value.trim();
-  const email   = document.getElementById('email').value.trim();
-  const contacto= document.getElementById('contacto').value.trim();
-  const obs     = document.getElementById('obs').value.trim();
-  const fecha   = new Date().toISOString().slice(0,10);
-
-  if(FLOW_URL.includes('PEGA-AQUI')){
-    await demo(prov,ana,Object.keys(files).length);
-    return;
+/* ════════════════════════════════════════════════════════
+   ENVIAR DOCUMENTOS
+   ════════════════════════════════════════════════════════ */
+async function submitDocumentos() {
+  // Validar requeridos empresa
+  const faltanEmpresa = DOCS_EMPRESA.filter(d => d.req && !fileStore[d.id]);
+  if (faltanEmpresa.length > 0) {
+    faltanEmpresa.forEach(d => document.getElementById('doc-item-'+d.id).classList.add('required-missing'));
+    return showAlert('docs-alert','error','Faltan documentos obligatorios de empresa:\n' + faltanEmpresa.map(d=>d.name).join(', '));
   }
 
-  try{
-    showAlert('loading','Preparando envío...');
-    let enviados=0;
-    const total=Object.keys(files).length;
+  const btn = document.getElementById('btn-submit-docs');
+  btn.disabled = true;
+  showAlert('docs-alert','loading','Preparando archivos...');
 
-    // Enviar cada archivo al flujo de Power Automate
-    for(const[fileKey,file] of Object.entries(files)){
-      // Determinar categoría y nombre del documento
-      const allDocs=[...DOCS.proveedor,...DOCS.conductor,...DOCS.unidad];
-
-      // Para entradas múltiples: fileKey puede ser "cond1_c01" o "unid1_u01"
-      let cat='Proveedor', docId=fileKey, subNombre='', entryNum=1;
-      if(fileKey.startsWith('cond')){
-        cat='Conductor';
-        const parts=fileKey.split('_'); entryNum=parts[0].replace('cond','');
-        docId=parts[1];
-        const inputEl=document.getElementById('cond-nombre-'+entryNum);
-        subNombre=inputEl?inputEl.value.trim():'Conductor '+entryNum;
-      } else if(fileKey.startsWith('unid')){
-        cat='Unidad';
-        const parts=fileKey.split('_'); entryNum=parts[0].replace('unid','');
-        docId=parts[1];
-        const inputEl=document.getElementById('unid-placa-'+entryNum);
-        subNombre=inputEl?inputEl.value.trim().toUpperCase():'Unidad '+entryNum;
-      }
-
-      const docMeta=allDocs.find(d=>d.id===docId)||{name:docId};
-
-      // Convertir archivo a base64
-      const b64=await toBase64(file);
-
-      // Construir payload para Power Automate
-      const payload={
-        proveedor: prov,
-        ruc: ruc,
-        analista: ana,
-        email: email,
-        contacto: contacto,
-        observaciones: obs,
-        fecha: fecha,
-        categoria: cat,
-        subcarpeta: subNombre,
-        documento: docMeta.name,
-        nombre_archivo: file.name,
-        tipo_archivo: file.type||'application/octet-stream',
-        contenido_base64: b64,
-        // Ruta que Power Automate usará para crear la carpeta:
-        // Transportistas / ANALISTA / PROVEEDOR / Conductor o Unidad / subNombre /
-        ruta_carpeta: `Transportistas/${ana}/${prov}/${cat}${subNombre?'/'+subNombre:''}`
-      };
-
-      const res=await fetch(FLOW_URL,{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(payload)
-      });
-
-      if(!res.ok) throw new Error('Error en '+file.name+': '+res.statusText);
-      enviados++;
-      document.getElementById('prog-fill').style.width=(enviados/total*100)+'%';
-      document.getElementById('prog-count').textContent=enviados+' / '+total;
-      showAlert('loading',`Subiendo ${enviados} de ${total} archivos...`);
+  try {
+    const archivos = [];
+    for (const [docId, file] of Object.entries(fileStore)) {
+      showAlert('docs-alert','loading',`Procesando ${file.name}...`);
+      const b64 = await toBase64(file);
+      archivos.push({ id: docId, nombre: file.name, tipo: file.type || 'application/octet-stream', contenido: b64 });
     }
 
-    showAlert('success',
-      '✅ '+total+' archivo(s) enviados correctamente a SharePoint.\n'+
-      'Carpeta: Transportistas / '+ana+' / '+prov+'\n'+
-      'El analista '+ana+' recibirá una notificación por correo.'
-    );
-    btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="17" height="17"><polyline points="20 6 9 17 4 12"/></svg> Enviado correctamente';
+    const obs = document.getElementById('doc-obs').value.trim();
+    const payload = {
+      ruc:        SESSION.ruc,
+      razonSocial: SESSION.razonSocial,
+      email:      SESSION.email,
+      analista:   SESSION.analista,
+      conductor,
+      placa,
+      obs,
+      archivos,
+      ruta_carpeta: SESSION.carpeta,
+      subcarpetas_base: ['Proveedor','Conductor','Unidad'],
+      sitio_sharepoint: 'https://betacompe.sharepoint.com/sites/Intranet',
+      biblioteca: 'Documentos compartidos'
+    };
 
-  }catch(e){
-    showAlert('error','Error al enviar: '+e.message+'\nVerifica la URL del flujo en Power Automate.');
-    btn.disabled=false;
+    showAlert('docs-alert','loading',`Enviando ${archivos.length} archivo(s) a SharePoint...`);
+
+    if (CFG.DEMO) {
+      await new Promise(r => setTimeout(r, 1200));
+      let i = 0;
+      for (const a of archivos) {
+        i++;
+        document.getElementById('prog-fill').style.width = (i/archivos.length*100) + '%';
+        document.getElementById('prog-count').textContent = i + ' / ' + archivos.length;
+        await new Promise(r => setTimeout(r, 400));
+      }
+    } else {
+      const res = await callFlow(CFG.FLOW_SUBIR_DOCS, payload);
+      document.getElementById('prog-fill').style.width = '100%';
+      document.getElementById('prog-count').textContent = archivos.length + ' / ' + archivos.length;
+    }
+
+    // Mostrar pantalla de éxito con confeti
+    setTimeout(() => showExito(archivos.length), 400);
+
+  } catch(e) {
+    showAlert('docs-alert','error','Error al enviar: ' + e.message);
+    btn.disabled = false;
   }
 }
 
-// Convierte File a base64 string
-function toBase64(file){
-  return new Promise((resolve,reject)=>{
-    const reader=new FileReader();
-    reader.onload=()=>resolve(reader.result.split(',')[1]);
-    reader.onerror=reject;
-    reader.readAsDataURL(file);
-  });
+/* ════════════════════════════════════════════════════════
+   PANTALLA DE ÉXITO + CONFETI
+   ════════════════════════════════════════════════════════ */
+function showExito(numArchivos) {
+  // Actualizar meta info
+  const meta = document.getElementById('success-meta');
+  meta.innerHTML =
+    `📁 <strong>${SESSION.carpeta || 'Carpeta SharePoint'}</strong><br>` +
+    `📄 <strong>${numArchivos} archivo(s)</strong> enviados correctamente<br>` +
+    `👤 Analista <strong>${SESSION.analista || ''}</strong> notificado por correo<br>` +
+    `✅ Proceso completado — ${new Date().toLocaleDateString('es-PE',{day:'2-digit',month:'long',year:'numeric'})}`;
+
+  const sub = document.getElementById('success-sub');
+  sub.innerHTML =
+    `Tus documentos llegaron a SharePoint y <strong style="color:#b4f06e">${SESSION.analista || 'el analista'}</strong> ya fue notificado.<br>` +
+    `<span style="color:rgba(255,255,255,.7)">¡Gracias por confiar en Complejo Agroindustrial Beta!</span>`;
+
+  document.getElementById('screen-success').classList.add('show');
+  window.scrollTo({ top: 0 });
+  lanzarConfeti();
 }
 
-async function demo(prov,ana,n){
-  const steps=[
-    'Preparando archivos...',
-    'Conectando con Power Automate...',
-    'Creando carpeta: Transportistas/'+ana+'/'+prov+'/',
-    'Guardando documentos en SharePoint...',
-    '¡Listo!'
-  ];
-  for(let i=0;i<steps.length;i++){
-    showAlert('loading',steps[i]);
-    await new Promise(r=>setTimeout(r,700));
-    document.getElementById('prog-fill').style.width=((i+1)/steps.length*100)+'%';
+function cerrarExito() {
+  document.getElementById('screen-success').classList.remove('show');
+  // Limpiar confeti
+  document.querySelectorAll('.confetti-piece').forEach(el => el.remove());
+  cerrarSesion();
+}
+
+function lanzarConfeti() {
+  const colores = ['#79CC38','#5212A0','#F59E0B','#ffffff','#b4f06e','#8B4DD8','#5BAD1E'];
+  const total = 90;
+  for (let i = 0; i < total; i++) {
+    setTimeout(() => {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      const size = Math.random() * 10 + 6;
+      piece.style.cssText = `
+        left: ${Math.random() * 100}vw;
+        width: ${size}px;
+        height: ${size * (Math.random() > .5 ? 1 : 2.5)}px;
+        background: ${colores[Math.floor(Math.random() * colores.length)]};
+        opacity: ${Math.random() * .6 + .4};
+        animation-duration: ${Math.random() * 2.5 + 2}s;
+        animation-delay: 0s;
+        transform: rotate(${Math.random() * 360}deg);
+      `;
+      document.body.appendChild(piece);
+      setTimeout(() => piece.remove(), 5000);
+    }, i * 40);
   }
-  showAlert('success',
-    '✅ MODO DEMO — Los '+n+' archivo(s) se enviarían a SharePoint así:\n\n'+
-    '📁 Transportistas/\n'+
-    '  📁 '+ana+'/\n'+
-    '    📁 '+prov+'/\n'+
-    '      📁 Proveedor/ → documentos de empresa\n'+
-    '      📁 Conductor/Nombre/ → docs por conductor\n'+
-    '      📁 Unidad/Placa/ → docs por vehículo\n\n'+
-    '👉 Para activar: pega la URL de tu flujo Power Automate en FLOW_URL al inicio del script.'
-  );
-  const btn=document.getElementById('btn-submit');
-  btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="17" height="17"><polyline points="20 6 9 17 4 12"/></svg> Demo completado';
 }
 
-function showAlert(type,msg){
-  const box=document.getElementById('alert-box');
-  box.className='alert '+type;
-  const ico=type==='success'
-    ?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
-    :type==='error'
-    ?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
-    :'<div class="spin"></div>';
-  box.innerHTML=ico+'<span style="white-space:pre-line">'+msg+'</span>';
-  box.scrollIntoView({behavior:'smooth',block:'nearest'});
-}
 </script>
 </body>
 </html>
