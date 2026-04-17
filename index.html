@@ -393,7 +393,7 @@ footer{
   </div>
   <div class="nav-right">
     <span class="nav-pill-p nav-pill">Portal Proveedores</span>
-    <span id="demo-badge" class="nav-pill" style="background:rgba(245,158,11,.25);color:#fde68a;border-color:rgba(245,158,11,.4)">⚡ DEMO</span>
+    <span id="demo-badge" class="nav-pill" style="display:none;background:rgba(245,158,11,.25);color:#fde68a;border-color:rgba(245,158,11,.4)">⚡ DEMO</span>
     <div id="nav-session" class="nav-session" style="display:none" onclick="cerrarSesion()">
       <div class="nav-session-avatar" id="nav-avatar">?</div>
       <span class="nav-session-name" id="nav-name">Proveedor</span>
@@ -907,26 +907,30 @@ const CFG = {
   BASE_PATH: 'CADENA_DE_SUMINISTROS/2.Compras/TRANSPORTE 2026',
   // Flujo: verificar si RUC existe en lista SharePoint
   // Recibe: { ruc, email } — Devuelve: { existe: bool, razonSocial, carpeta, analista }
-  FLOW_VERIFICAR_RUC: 'PEGA_URL_FLOW_VERIFICAR_RUC_AQUI',
+  FLOW_VERIFICAR_RUC: 'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/d404ad4b46dd4868a0ac28d09ffe0a0f/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=E4aB_yIFWw5zuisDBfPGyQ7JfZUb0YMzPajUMEZCFA0',
 
   // Flujo: registrar nuevo proveedor + crear carpeta + enviar OTP
-  // Recibe: { ruc, razonSocial, email, contacto, analista, telefono, obs, ...archivos base64 }
-  FLOW_REGISTRAR: 'PEGA_URL_FLOW_REGISTRAR_AQUI',
+  FLOW_REGISTRAR: 'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/4a59933c3dd442078b22db95ce8a6aa7/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=DNNNEfIlxHXc21YJIsjzhxx2Qa4IxCh_SkOuRR31ndw',
 
   // Flujo: enviar OTP para login (proveedor ya registrado)
-  // Recibe: { ruc, email } — Genera OTP, lo guarda en lista, lo envía por correo
-  FLOW_ENVIAR_OTP: 'PEGA_URL_FLOW_ENVIAR_OTP_AQUI',
+  FLOW_ENVIAR_OTP: 'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/f2eb93ddbf044f7789ae8fa80518f549/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=PETK1l9jaK285bmPL18JpNof0wx313_h4jvRIUnkK6k',
 
   // Flujo: verificar OTP ingresado
-  // Recibe: { ruc, email, otp } — Devuelve: { valido: bool, razonSocial, carpeta, analista }
-  FLOW_VERIFICAR_OTP: 'PEGA_URL_FLOW_VERIFICAR_OTP_AQUI',
+  FLOW_VERIFICAR_OTP: 'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/be4d3dc86fee423ca46acef1e9846cf1/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=n4IRLz3NSael_eU0Qb2uNdhB2PBHJu8Oki0m_B4ki2w',
 
   // Flujo: subir documentos a SharePoint
-  // Recibe: payload con archivos base64
-  FLOW_SUBIR_DOCS: 'PEGA_URL_FLOW_SUBIR_DOCS_AQUI',
+  FLOW_SUBIR_DOCS: 'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/419179b11cf744c1ada94f017f9839ad/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=17SUUUfYxOSA0S57MmeiNV1iZn-KD5ukBHVw_7gX15s',
 
-  // ¿Modo demo? (true = sin llamadas reales)
-  DEMO: true
+  // ─── SIN LISTA DE SHAREPOINT ────────────────────────────────
+  // La carpeta se nombra: RUC_RAZON-SOCIAL  (ej: 20612307599_EMPRESA SAC)
+  // Power Automate busca carpetas que empiecen con el RUC — sin lista extra.
+  RUC_AS_KEY: true,
+
+  // Token de apis.net.pe para consulta SUNAT
+  APIS_NET_PE_TOKEN: '7ddcc309a88f8187d073fc1a59121919',
+
+  // ¿Modo demo? (false = producción real con Power Automate)
+  DEMO: false
 };
 
 /* ════════════════════════════════════════════════════════
@@ -1146,18 +1150,45 @@ function fillSunatData(data) {
 
 async function buscarRuc(ruc) {
   setRucState('loading');
+  const token = CFG.APIS_NET_PE_TOKEN || '';
+  const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
+
+  // Intento 1: apis.net.pe v2 (con token)
   try {
-    const r = await fetch(`https://api.apis.net.pe/v1/ruc?numero=${ruc}`, { headers: { 'Authorization': 'Bearer apis-token-demo' } });
+    const r = await fetch(`https://api.apis.net.pe/v2/sunat/ruc?numero=${ruc}`, { headers });
     if (r.ok) { const d = await r.json(); if (d && (d.razonSocial || d.nombre)) { fillSunatData(d); return; } }
   } catch(e) {}
+
+  // Intento 2: apis.net.pe v1
   try {
-    const r2 = await fetch(`https://api.apis.net.pe/v2/sunat/ruc?numero=${ruc}`, { headers: { 'Authorization': 'Bearer apis-token-demo' } });
-    if (r2.ok) { const d2 = await r2.json(); if (d2 && (d2.razonSocial || d2.nombre)) { fillSunatData(d2); return; } }
+    const r = await fetch(`https://api.apis.net.pe/v1/ruc?numero=${ruc}`, { headers });
+    if (r.ok) { const d = await r.json(); if (d && (d.razonSocial || d.nombre)) { fillSunatData(d); return; } }
   } catch(e) {}
+
+  // Intento 3: apiperu.dev (sin token, fallback gratuito)
+  try {
+    const r = await fetch(`https://api.apiperu.dev/api/ruc/${ruc}`);
+    if (r.ok) {
+      const d = await r.json();
+      if (d && d.data) {
+        fillSunatData({
+          razonSocial: d.data.nombre_o_razon_social || d.data.razonSocial || '',
+          estado:      d.data.estado_del_contribuyente || d.data.estado || '',
+          condicion:   d.data.condicion_de_domicilio   || d.data.condicion || '',
+          direccion:   d.data.direccion                || d.data.domicilioFiscal || '',
+        });
+        return;
+      }
+    }
+  } catch(e) {}
+
+  // Todas fallaron — habilitar edición manual
   setRucState('error', 'No se pudo consultar SUNAT — ingresa la razón social manualmente');
-  const r = document.getElementById('reg-razon');
-  r.readOnly = false; r.style.background = 'var(--pll)';
-  r.placeholder = 'Ingresa la razón social manualmente'; r.focus();
+  const razonEl = document.getElementById('reg-razon');
+  razonEl.readOnly = false;
+  razonEl.style.background = 'var(--pll)';
+  razonEl.placeholder = 'Ingresa la razón social manualmente';
+  razonEl.focus();
 }
 
 /* ════════════════════════════════════════════════════════
@@ -1298,13 +1329,13 @@ async function submitRegistro() {
     }
 
     const payload = { ruc, razonSocial: razon, email, contacto, analista, categoria: cat, telefono, obs, archivos,
-      ruta_carpeta: `${CFG.BASE_PATH}/${cat}/${analista}/${razon}`,
+      ruta_carpeta: `${CFG.BASE_PATH}/${cat}/${analista}/${ruc}_${razon}`,
       subcarpetas: ['Proveedor','Conductor','Unidad'] };
 
     const result = await callFlow(CFG.FLOW_REGISTRAR, payload);
 
     // Demo: simular OTP enviado
-    SESSION = { ruc, email, razonSocial: razon, categoria: cat, carpeta: `${CFG.BASE_PATH}/${cat}/${analista}/${razon}`, analista, modo: 'nuevo' };
+    SESSION = { ruc, email, razonSocial: razon, categoria: cat, carpeta: `${CFG.BASE_PATH}/${cat}/${analista}/${ruc}_${razon}`, analista, modo: 'nuevo' };
 
     hideAlert('reg-alert');
     mostrarOtp(email);
@@ -1324,13 +1355,10 @@ async function solicitarOtpLogin() {
   if (ruc.length !== 11) return showAlert('login-alert','error','Ingresa el RUC de 11 dígitos.');
   if (!email) return showAlert('login-alert','error','Ingresa tu correo electrónico registrado.');
 
-  showAlert('login-alert','loading','Verificando RUC y enviando código...');
+  showAlert('login-alert','loading','Verificando RUC...');
 
   try {
-    const result = await callFlow(CFG.FLOW_ENVIAR_OTP, { ruc, email });
-
     if (CFG.DEMO) {
-      // En demo simulamos que el RUC existe
       SESSION = { ruc, email,
         razonSocial: 'EMPRESA DEMO S.A.C.',
         categoria: 'TRANSPORTE DE SERVICIOS NORTE Y SUR',
@@ -1338,12 +1366,19 @@ async function solicitarOtpLogin() {
         analista: 'CREGALADO', modo: 'existente'
       };
     } else {
-      if (!result.existe) {
+      const verificacion = await callFlow(CFG.FLOW_VERIFICAR_RUC, { ruc, email });
+      if (!verificacion.existe) {
         return showAlert('login-alert','warning',
           'RUC no encontrado en nuestro sistema.\n¿Es tu primera vez? Usa "Registrarme como proveedor".');
       }
-      SESSION = { ruc, email, razonSocial: result.razonSocial || '', carpeta: result.carpeta || '',
-        analista: result.analista || '', modo: 'existente' };
+      SESSION = { ruc, email,
+        razonSocial: verificacion.razonSocial || '',
+        carpeta:     verificacion.carpeta     || '',
+        analista:    verificacion.analista    || '',
+        modo: 'existente'
+      };
+      showAlert('login-alert','loading','RUC verificado. Enviando código de verificación...');
+      await callFlow(CFG.FLOW_ENVIAR_OTP, { ruc, email, contacto: verificacion.razonSocial || ruc });
     }
 
     hideAlert('login-alert');
