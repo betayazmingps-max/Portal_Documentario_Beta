@@ -907,19 +907,13 @@ const CFG = {
   BASE_PATH: 'CADENA_DE_SUMINISTROS/2.Compras/TRANSPORTE 2026',
   // Flujo: verificar si RUC existe en lista SharePoint
   // Recibe: { ruc, email } — Devuelve: { existe: bool, razonSocial, carpeta, analista }
-  FLOW_VERIFICAR_RUC: 'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/d404ad4b46dd4868a0ac28d09ffe0a0f/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=E4aB_yIFWw5zuisDBfPGyQ7JfZUb0YMzPajUMEZCFA0',
-
-  // Flujo: registrar nuevo proveedor + crear carpeta + enviar OTP
-  FLOW_REGISTRAR: 'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/4a59933c3dd442078b22db95ce8a6aa7/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=DNNNEfIlxHXc21YJIsjzhxx2Qa4IxCh_SkOuRR31ndw',
-
-  // Flujo: enviar OTP para login (proveedor ya registrado)
-  FLOW_ENVIAR_OTP: 'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/f2eb93ddbf044f7789ae8fa80518f549/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=PETK1l9jaK285bmPL18JpNof0wx313_h4jvRIUnkK6k',
-
-  // Flujo: verificar OTP ingresado
-  FLOW_VERIFICAR_OTP: 'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/be4d3dc86fee423ca46acef1e9846cf1/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=n4IRLz3NSael_eU0Qb2uNdhB2PBHJu8Oki0m_B4ki2w',
-
-  // Flujo: subir documentos a SharePoint
-  FLOW_SUBIR_DOCS: 'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/419179b11cf744c1ada94f017f9839ad/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=17SUUUfYxOSA0S57MmeiNV1iZn-KD5ukBHVw_7gX15s',
+  // ── Cloudflare Worker proxy (resuelve CORS desde GitHub Pages) ──
+  // Worker: portalbeta.betayazmingps.workers.dev
+  FLOW_VERIFICAR_RUC: 'https://portalbeta.betayazmingps.workers.dev/verificar_ruc',
+  FLOW_REGISTRAR:     'https://portalbeta.betayazmingps.workers.dev/registrar',
+  FLOW_ENVIAR_OTP:    'https://portalbeta.betayazmingps.workers.dev/enviar_otp',
+  FLOW_VERIFICAR_OTP: 'https://portalbeta.betayazmingps.workers.dev/verificar_otp',
+  FLOW_SUBIR_DOCS:    'https://portalbeta.betayazmingps.workers.dev/subir_docs',
 
   // ─── SIN LISTA DE SHAREPOINT ────────────────────────────────
   // La carpeta se nombra: RUC_RAZON-SOCIAL  (ej: 20612307599_EMPRESA SAC)
