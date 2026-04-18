@@ -1144,39 +1144,19 @@ function fillSunatData(data) {
 
 async function buscarRuc(ruc) {
   setRucState('loading');
-  const token = CFG.APIS_NET_PE_TOKEN || '';
-  const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
-
-  // Intento 1: apis.net.pe v2 (con token)
+  // Consulta SUNAT a través del Worker (evita CORS desde GitHub Pages)
   try {
-    const r = await fetch(`https://api.apis.net.pe/v2/sunat/ruc?numero=${ruc}`, { headers });
-    if (r.ok) { const d = await r.json(); if (d && (d.razonSocial || d.nombre)) { fillSunatData(d); return; } }
-  } catch(e) {}
-
-  // Intento 2: apis.net.pe v1
-  try {
-    const r = await fetch(`https://api.apis.net.pe/v1/ruc?numero=${ruc}`, { headers });
-    if (r.ok) { const d = await r.json(); if (d && (d.razonSocial || d.nombre)) { fillSunatData(d); return; } }
-  } catch(e) {}
-
-  // Intento 3: apiperu.dev (sin token, fallback gratuito)
-  try {
-    const r = await fetch(`https://api.apiperu.dev/api/ruc/${ruc}`);
+    const r = await fetch('https://portalbeta.betayazmingps.workers.dev/sunat_ruc', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ruc, token: CFG.APIS_NET_PE_TOKEN || '' })
+    });
     if (r.ok) {
       const d = await r.json();
-      if (d && d.data) {
-        fillSunatData({
-          razonSocial: d.data.nombre_o_razon_social || d.data.razonSocial || '',
-          estado:      d.data.estado_del_contribuyente || d.data.estado || '',
-          condicion:   d.data.condicion_de_domicilio   || d.data.condicion || '',
-          direccion:   d.data.direccion                || d.data.domicilioFiscal || '',
-        });
-        return;
-      }
+      if (d && (d.razonSocial || d.nombre)) { fillSunatData(d); return; }
     }
   } catch(e) {}
-
-  // Todas fallaron — habilitar edición manual
+  // Falló — habilitar edición manual
   setRucState('error', 'No se pudo consultar SUNAT — ingresa la razón social manualmente');
   const razonEl = document.getElementById('reg-razon');
   razonEl.readOnly = false;
