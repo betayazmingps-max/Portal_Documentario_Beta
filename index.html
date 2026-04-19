@@ -570,12 +570,10 @@ footer{
         </div>
         <div class="field">
           <label>Categoría de transporte <span class="req">*</span></label>
-          <select id="reg-categoria">
+          <select id="reg-categoria" onchange="actualizarAnalistas(this.value)">
             <option value="">Seleccionar...</option>
             <option value="Servicios Norte Y Sur">Servicios Norte y Sur</option>
             <option value="Transporte de Personal">Transporte de Personal</option>
-            <option value="PROYECTO HANNA">Proyecto Hanna</option>
-            <option value="PROGRAMA DE MANTENIMIENTO">Programa de Mantenimiento</option>
           </select>
           <span class="hint">Carpeta donde se guardarán tus documentos</span>
         </div>
@@ -584,10 +582,7 @@ footer{
         <div class="field">
           <label>Analista responsable <span class="req">*</span></label>
           <select id="reg-analista">
-            <option value="">Seleccionar...</option>
-            <option value="C. REGALADO">C. REGALADO</option>
-            <option value="E. ODAR">E. ODAR</option>
-            <option value="J. PADILLA">J. PADILLA</option>
+            <option value="">— Selecciona categoría primero —</option>
           </select>
         </div>
         <div class="field">
@@ -1132,6 +1127,43 @@ function clearSunatData() {
 
 // Almacén global de datos SUNAT
 let SUNAT_DATA = {};
+
+/* ════════════════════════════════════════════════════════
+   ANALISTAS POR CATEGORÍA
+   ════════════════════════════════════════════════════════ */
+const ANALISTAS_POR_CATEGORIA = {
+  'Servicios Norte Y Sur': [
+    { value: 'NORTE', label: 'NORTE' },
+    { value: 'SUR',   label: 'SUR'   },
+  ],
+  'Transporte de Personal': [
+    { value: 'C. REGALADO', label: 'C. REGALADO' },
+    { value: 'E. ODAR',     label: 'E. ODAR'     },
+    { value: 'J. PADILLA',  label: 'J. PADILLA'  },
+  ],
+  'PROYECTO HANNA': [
+    { value: 'C. REGALADO', label: 'C. REGALADO' },
+    { value: 'E. ODAR',     label: 'E. ODAR'     },
+    { value: 'J. PADILLA',  label: 'J. PADILLA'  },
+  ],
+  'PROGRAMA DE MANTENIMIENTO': [
+    { value: 'C. REGALADO', label: 'C. REGALADO' },
+    { value: 'E. ODAR',     label: 'E. ODAR'     },
+    { value: 'J. PADILLA',  label: 'J. PADILLA'  },
+  ],
+};
+
+function actualizarAnalistas(categoria) {
+  const sel = document.getElementById('reg-analista');
+  sel.innerHTML = '<option value="">Seleccionar analista...</option>';
+  const lista = ANALISTAS_POR_CATEGORIA[categoria] || [];
+  lista.forEach(a => {
+    const opt = document.createElement('option');
+    opt.value = a.value;
+    opt.textContent = a.label;
+    sel.appendChild(opt);
+  });
+}
 
 function fillSunatData(data) {
   // Guardar todos los datos SUNAT globalmente
