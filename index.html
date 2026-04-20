@@ -570,12 +570,10 @@ footer{
         </div>
         <div class="field">
           <label>Categoría de transporte <span class="req">*</span></label>
-          <select id="reg-categoria">
+          <select id="reg-categoria" onchange="actualizarAnalistas(this.value)">
             <option value="">Seleccionar...</option>
             <option value="Servicios Norte Y Sur">Servicios Norte y Sur</option>
             <option value="Transporte de Personal">Transporte de Personal</option>
-            <option value="PROYECTO HANNA">Proyecto Hanna</option>
-            <option value="PROGRAMA DE MANTENIMIENTO">Programa de Mantenimiento</option>
           </select>
           <span class="hint">Carpeta donde se guardarán tus documentos</span>
         </div>
@@ -584,10 +582,7 @@ footer{
         <div class="field">
           <label>Analista responsable <span class="req">*</span></label>
           <select id="reg-analista">
-            <option value="">Seleccionar...</option>
-            <option value="C. REGALADO">C. REGALADO</option>
-            <option value="E. ODAR">E. ODAR</option>
-            <option value="J. PADILLA">J. PADILLA</option>
+            <option value="">— Selecciona categoría primero —</option>
           </select>
         </div>
         <div class="field">
@@ -703,7 +698,7 @@ footer{
       </div>
 
       <div id="otp-timer-wrap" style="margin-bottom:1rem">
-        <p class="otp-timer">Código válido por <strong id="otp-countdown">02:00</strong></p>
+        <p class="otp-timer">Código válido por <strong id="otp-countdown">10:00</strong></p>
       </div>
       <div id="otp-resend-wrap" style="display:none;margin-bottom:1rem">
         <button class="btn-resend" onclick="reenviarOtp()">Reenviar código</button>
@@ -981,11 +976,12 @@ const DOCS_UNIDAD = [
 
 // Archivos registros iniciales (presentación)
 const DOCS_REGISTRO = [
-  { id:'reg_brochure',  name:'Brochure / Presentación', req:false },
-  { id:'reg_cotizacion',name:'Cotización',              req:false },
-  { id:'reg_ficha',     name:'Ficha técnica',           req:false },
-  { id:'reg_carta',     name:'Carta de presentación',   req:false },
-  { id:'reg_otro',      name:'Otro documento',          req:false },
+  { id:'reg_brochure',  name:'Brochure',                          req:false },
+  { id:'reg_carta',     name:'Carta de presentación',             req:false },
+  { id:'reg_ficha',     name:'Ficha RUC',                         req:false },
+  { id:'reg_deuda',     name:'Deudas coactivas',                  req:false },
+  { id:'reg_ref',       name:'Referencias comerciales',           req:false },
+  { id:'reg_vigencia',  name:'Vigencia poder rep. legal',         req:false },
 ];
 
 const fileStore = {}; // docId → File
@@ -1129,7 +1125,49 @@ function clearSunatData() {
   ['sunat-estado','sunat-condicion','sunat-direccion'].forEach(id => document.getElementById(id).value = '');
 }
 
+// Almacén global de datos SUNAT
+let SUNAT_DATA = {};
+
+/* ════════════════════════════════════════════════════════
+   ANALISTAS POR CATEGORÍA
+   ════════════════════════════════════════════════════════ */
+const ANALISTAS_POR_CATEGORIA = {
+  'Servicios Norte Y Sur': [
+    { value: 'NORTE', label: 'NORTE' },
+    { value: 'SUR',   label: 'SUR'   },
+  ],
+  'Transporte de Personal': [
+    { value: 'C. REGALADO', label: 'C. REGALADO' },
+    { value: 'E. ODAR',     label: 'E. ODAR'     },
+    { value: 'J. PADILLA',  label: 'J. PADILLA'  },
+  ],
+  'PROYECTO HANNA': [
+    { value: 'C. REGALADO', label: 'C. REGALADO' },
+    { value: 'E. ODAR',     label: 'E. ODAR'     },
+    { value: 'J. PADILLA',  label: 'J. PADILLA'  },
+  ],
+  'PROGRAMA DE MANTENIMIENTO': [
+    { value: 'C. REGALADO', label: 'C. REGALADO' },
+    { value: 'E. ODAR',     label: 'E. ODAR'     },
+    { value: 'J. PADILLA',  label: 'J. PADILLA'  },
+  ],
+};
+
+function actualizarAnalistas(categoria) {
+  const sel = document.getElementById('reg-analista');
+  sel.innerHTML = '<option value="">Seleccionar analista...</option>';
+  const lista = ANALISTAS_POR_CATEGORIA[categoria] || [];
+  lista.forEach(a => {
+    const opt = document.createElement('option');
+    opt.value = a.value;
+    opt.textContent = a.label;
+    sel.appendChild(opt);
+  });
+}
+
 function fillSunatData(data) {
+  // Guardar todos los datos SUNAT globalmente
+  SUNAT_DATA = data;
   const r = document.getElementById('reg-razon');
   r.value = data.razonSocial || data.nombre || '';
   r.readOnly = false; r.style.background = 'var(--gl)';
@@ -1202,11 +1240,11 @@ function clearOtp() {
    COUNTDOWN OTP
    ════════════════════════════════════════════════════════ */
 let otpInterval = null;
-let otpSeconds = 120;
+let otpSeconds = 600;
 
 function startOtpCountdown() {
   clearInterval(otpInterval);
-  otpSeconds = 120;
+  otpSeconds = 600;
   document.getElementById('otp-timer-wrap').style.display = 'block';
   document.getElementById('otp-resend-wrap').style.display = 'none';
   updateOtpDisplay();
@@ -1302,18 +1340,37 @@ async function submitRegistro() {
       }
     }
 
+    // Datos SUNAT para carpeta Identificacion Fiscal
+    const datosFiscales = {
+      razonSocial:        SUNAT_DATA.razonSocial || SUNAT_DATA.nombre || razon,
+      ruc:                ruc,
+      estado:             SUNAT_DATA.estado || '',
+      condicion:          SUNAT_DATA.condicion || '',
+      direccion:          SUNAT_DATA.direccion || SUNAT_DATA.domicilioFiscal || '',
+      tipo:               SUNAT_DATA.tipo || '',
+      actividadEconomica: SUNAT_DATA.actividadEconomica || SUNAT_DATA.ciiu || '',
+      representanteLegal: SUNAT_DATA.representanteLegal || '',
+      fechaInscripcion:   SUNAT_DATA.fechaInscripcion || '',
+      fechaInicioActividades: SUNAT_DATA.fechaInicioActividades || '',
+      sistemaEmision:     SUNAT_DATA.sistemaEmision || '',
+      sistemaContabilidad:SUNAT_DATA.sistemaContabilidad || '',
+      nombreComercial:    SUNAT_DATA.nombreComercial || '',
+    };
+
     const payload = { ruc, razonSocial: razon, email, contacto, analista, categoria: cat, telefono, obs, archivos,
       ruta_carpeta: `${CFG.BASE_PATH}/${cat}/${analista}/${ruc}_${razon}`,
       subcarpetas: ['Proveedor','Conductor','Unidad'],
-      carpeta_archivos_registro: `${CFG.BASE_PATH}/${cat}/${analista}/${ruc}_${razon}/Proveedor` };
+      datos_fiscales: datosFiscales,
+      crear_carpeta_fiscal: true
+    };
 
     const result = await callFlow(CFG.FLOW_REGISTRAR, payload);
 
-    // Demo: simular OTP enviado
     SESSION = { ruc, email, razonSocial: razon, categoria: cat, carpeta: `${CFG.BASE_PATH}/${cat}/${analista}/${ruc}_${razon}`, analista, modo: 'nuevo' };
 
     hideAlert('reg-alert');
-    mostrarOtp(email);
+    // Mostrar pantalla de éxito de registro y volver al inicio
+    mostrarExitoRegistro(razon);
 
   } catch(e) {
     showAlert('reg-alert','error','Error al registrar: ' + e.message);
@@ -1514,49 +1571,11 @@ async function verificarOtp() {
 
     clearInterval(otpInterval);
     hideAlert('otp-alert');
-    if (SESSION.modo === 'nuevo') {
-      mostrarExitoRegistro(SESSION.razonSocial);
-    } else {
-      accederDocumentos();
-    }
+    mostrarExitoOTP();
 
   } catch(e) {
     showAlert('otp-alert','error','Error al verificar: ' + e.message);
   }
-}
-
-/* ════════════════════════════════════════════════════════
-   ÉXITO DE REGISTRO
-   ════════════════════════════════════════════════════════ */
-function mostrarExitoRegistro(razonSocial) {
-  const fecha = new Date().toLocaleDateString('es-PE',{day:'2-digit',month:'long',year:'numeric'});
-  const meta = document.getElementById('success-meta');
-  meta.innerHTML =
-    `🏢 <strong>${razonSocial}</strong><br>` +
-    `✅ Empresa registrada exitosamente<br>` +
-    `📁 Carpeta creada en SharePoint<br>` +
-    `📧 Confirmación enviada a <strong>${SESSION.email}</strong><br>` +
-    `📅 ${fecha}`;
-  const sub = document.getElementById('success-sub');
-  sub.innerHTML =
-    `Tu empresa <strong style="color:#b4f06e">${razonSocial}</strong> fue registrada correctamente.<br>` +
-    `<span style="color:rgba(255,255,255,.7)">Cuando necesites subir documentación, ingresa con tu RUC y correo desde la pantalla principal.</span>`;
-  const titleEl = document.querySelector('.success-title');
-  if (titleEl) titleEl.innerHTML = '¡Registro<br><span>exitoso!</span> 🎉';
-  const btnCerrar = document.querySelector('.success-btn');
-  if (btnCerrar) {
-    btnCerrar.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Volver al inicio';
-    btnCerrar.onclick = () => {
-      document.getElementById('screen-success').classList.remove('show');
-      document.querySelectorAll('.confetti-piece').forEach(el => el.remove());
-      SESSION = { ruc:'', email:'', razonSocial:'', carpeta:'', analista:'', modo:'' };
-      document.getElementById('nav-session').style.display = 'none';
-      irA('screen-entry');
-    };
-  }
-  document.getElementById('screen-success').classList.add('show');
-  window.scrollTo({ top: 0 });
-  lanzarConfeti();
 }
 
 /* ════════════════════════════════════════════════════════
@@ -1571,22 +1590,13 @@ function accederDocumentos() {
   // Banner
   document.getElementById('docs-banner-name').textContent = `¡Bienvenido, ${SESSION.razonSocial || SESSION.ruc}!`;
   document.getElementById('docs-banner-sub').textContent =
-    SESSION.modo === 'nuevo'
-      ? 'Tu carpeta en SharePoint fue creada exitosamente'
-      : 'Sube los documentos que te faltan — ninguno es obligatorio esta vez';
+    SESSION.modo === 'nuevo' ? 'Tu carpeta en SharePoint fue creada exitosamente' : 'Tu carpeta en SharePoint está activa';
   document.getElementById('docs-folder-path').innerHTML =
     `Docs / CADENA_DE_SUMINISTROS / 2.Compras / TRANSPORTE 2026 / <span>${SESSION.categoria||''}</span> / <span>${SESSION.analista}</span> / <span>${SESSION.razonSocial || SESSION.ruc}</span>`;
 
   // Limpiar archivos anteriores
   Object.keys(fileStore).forEach(k => delete fileStore[k]);
-
-  // Existente → mismos docs pero sin obligatorio (ya tiene carpeta, solo sube lo que falta)
-  if (SESSION.modo === 'existente') {
-    const docsOpcionales = DOCS_EMPRESA.map(d => ({ ...d, req: false }));
-    renderDocGrid('docs-empresa', docsOpcionales);
-  } else {
-    renderDocGrid('docs-empresa', DOCS_EMPRESA);
-  }
+  renderDocGrid('docs-empresa', DOCS_EMPRESA);
   // Reset multi-entry conductor/unidad
   condEntryCount = 0; unidEntryCount = 0;
   document.getElementById('conductores-lista').innerHTML = '';
@@ -1721,11 +1731,57 @@ async function submitDocumentos() {
   showAlert('docs-alert','loading','Preparando archivos...');
 
   try {
+    // Recopilar info de conductores
+    const conductores = [];
+    for (let i = 1; i <= condEntryCount; i++) {
+      const el = document.getElementById('cond-entry-' + i);
+      if (!el) continue;
+      const nombre = document.getElementById('cond-nombre-' + i)?.value.trim() || 'Conductor_' + i;
+      conductores.push({ idx: i, nombre });
+    }
+
+    // Recopilar info de unidades
+    const unidades = [];
+    for (let i = 1; i <= unidEntryCount; i++) {
+      const el = document.getElementById('unid-entry-' + i);
+      if (!el) continue;
+      const placa = document.getElementById('unid-placa-' + i)?.value.trim() || 'Unidad_' + i;
+      unidades.push({ idx: i, placa });
+    }
+
     const archivos = [];
     for (const [docId, file] of Object.entries(fileStore)) {
       showAlert('docs-alert','loading',`Procesando ${file.name}...`);
       const b64 = await toBase64(file);
-      archivos.push({ id: docId, nombre: file.name, tipo: file.type || 'application/octet-stream', contenido: b64 });
+      // Determinar subcarpeta según el docId
+      let subcarpeta = 'Proveedor'; // default para docs de empresa
+      let entidad = '';
+      if (docId.startsWith('cond')) {
+        // Extraer índice del conductor: cond1_c01 → idx=1
+        const match = docId.match(/^cond(\d+)_/);
+        if (match) {
+          const idx = parseInt(match[1]);
+          const cond = conductores.find(c => c.idx === idx);
+          entidad = cond ? cond.nombre : 'Conductor_' + idx;
+          subcarpeta = 'Conductor';
+        }
+      } else if (docId.startsWith('unid')) {
+        const match = docId.match(/^unid(\d+)_/);
+        if (match) {
+          const idx = parseInt(match[1]);
+          const unid = unidades.find(u => u.idx === idx);
+          entidad = unid ? unid.placa : 'Unidad_' + idx;
+          subcarpeta = 'Unidad';
+        }
+      }
+      archivos.push({ 
+        id: docId, 
+        nombre: file.name, 
+        tipo: file.type || 'application/octet-stream', 
+        contenido: b64,
+        subcarpeta,
+        entidad
+      });
     }
 
     const obs = document.getElementById('doc-obs').value.trim();
@@ -1736,6 +1792,8 @@ async function submitDocumentos() {
       analista:   SESSION.analista,
       obs,
       archivos,
+      conductores,
+      unidades,
       ruta_carpeta: SESSION.carpeta,
       subcarpetas_base: ['Proveedor','Conductor','Unidad'],
       sitio_sharepoint: 'https://betacompe.sharepoint.com/sites/Intranet',
@@ -1765,6 +1823,91 @@ async function submitDocumentos() {
   } catch(e) {
     showAlert('docs-alert','error','Error al enviar: ' + e.message);
     btn.disabled = false;
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   ÉXITO DE REGISTRO — vuelve al inicio
+   ════════════════════════════════════════════════════════ */
+
+
+/* ════════════════════════════════════════════════════════
+   ÉXITO DE REGISTRO — vuelve al inicio
+   ════════════════════════════════════════════════════════ */
+function mostrarExitoRegistro(razonSocial) {
+  const meta = document.getElementById('success-meta');
+  meta.innerHTML =
+    `🏢 <strong>${razonSocial}</strong><br>` +
+    `✅ Registro completado exitosamente<br>` +
+    `📁 Carpeta creada en SharePoint<br>` +
+    `📧 Revisa tu correo — te enviamos la confirmación<br>` +
+    `📅 ${new Date().toLocaleDateString('es-PE',{day:'2-digit',month:'long',year:'numeric'})}`;
+
+  const sub = document.getElementById('success-sub');
+  sub.innerHTML =
+    `Tu empresa fue registrada correctamente en el Portal Proveedores Beta.<br>` +
+    `<span style="color:rgba(255,255,255,.7)">Cuando necesites subir documentación, ingresa con tu RUC y correo desde la pantalla principal.</span>`;
+
+  document.getElementById('screen-success').classList.add('show');
+  window.scrollTo({ top: 0 });
+  lanzarConfeti();
+
+  // Volver al inicio automáticamente al cerrar
+  const btnCerrar = document.querySelector('.success-btn');
+  if (btnCerrar) {
+    btnCerrar.textContent = '← Volver al inicio';
+    btnCerrar.onclick = () => {
+      document.getElementById('screen-success').classList.remove('show');
+      document.querySelectorAll('.confetti-piece').forEach(el => el.remove());
+      SESSION = { ruc:'', email:'', razonSocial:'', carpeta:'', analista:'', modo:'' };
+      document.getElementById('nav-session').style.display = 'none';
+      irA('screen-entry');
+    };
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   ÉXITO DESPUÉS DE VERIFICAR OTP
+   ════════════════════════════════════════════════════════ */
+function mostrarExitoOTP() {
+  const esNuevo = SESSION.modo === 'nuevo';
+
+  const meta = document.getElementById('success-meta');
+  meta.innerHTML = esNuevo
+    ? `🏢 <strong>${SESSION.razonSocial || SESSION.ruc}</strong><br>` +
+      `✅ Identidad verificada correctamente<br>` +
+      `📁 Carpeta creada en SharePoint<br>` +
+      `📅 ${new Date().toLocaleDateString('es-PE',{day:'2-digit',month:'long',year:'numeric'})}`
+    : `🏢 <strong>${SESSION.razonSocial || SESSION.ruc}</strong><br>` +
+      `✅ Código verificado correctamente<br>` +
+      `👤 Analista: <strong>${SESSION.analista || ''}</strong><br>` +
+      `📅 ${new Date().toLocaleDateString('es-PE',{day:'2-digit',month:'long',year:'numeric'})}`;
+
+  const sub = document.getElementById('success-sub');
+  sub.innerHTML = esNuevo
+    ? `¡Bienvenido al sistema! Tu empresa quedó registrada.<br>
+       <span style="color:rgba(255,255,255,.7)">Cuando necesites subir documentación, ingresa con tu RUC y correo.</span>`
+    : `Tu sesión fue verificada exitosamente.<br>
+       <span style="color:rgba(255,255,255,.7)">¡Gracias por confiar en Complejo Agroindustrial Beta!</span>`;
+
+  document.getElementById('screen-success').classList.add('show');
+  window.scrollTo({ top: 0 });
+  lanzarConfeti();
+
+  const btnCerrar = document.querySelector('.success-btn');
+  if (btnCerrar) {
+    btnCerrar.textContent = esNuevo ? '← Volver al inicio' : '📁 Ir a documentos';
+    btnCerrar.onclick = () => {
+      document.getElementById('screen-success').classList.remove('show');
+      document.querySelectorAll('.confetti-piece').forEach(el => el.remove());
+      if (esNuevo) {
+        SESSION = { ruc:'', email:'', razonSocial:'', carpeta:'', analista:'', modo:'' };
+        document.getElementById('nav-session').style.display = 'none';
+        irA('screen-entry');
+      } else {
+        accederDocumentos();
+      }
+    };
   }
 }
 
