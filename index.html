@@ -698,7 +698,7 @@ footer{
       </div>
 
       <div id="otp-timer-wrap" style="margin-bottom:1rem">
-        <p class="otp-timer">Código válido por <strong id="otp-countdown">02:00</strong></p>
+        <p class="otp-timer">Código válido por <strong id="otp-countdown">10:00</strong></p>
       </div>
       <div id="otp-resend-wrap" style="display:none;margin-bottom:1rem">
         <button class="btn-resend" onclick="reenviarOtp()">Reenviar código</button>
@@ -843,31 +843,27 @@ footer{
 
 <!-- ══ PANTALLA ÉXITO ════════════════════════════════════ -->
 <div id="screen-success">
-  <!-- Ícono animado -->
-  <div class="success-icon-wrap" id="success-icon-wrap">
-    <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#1C0840" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  <div class="success-icon-wrap">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1C0840" stroke-width="2.5" stroke-linecap="round">
       <polyline points="20 6 9 17 4 12"/>
     </svg>
   </div>
-  <!-- Título dinámico -->
-  <div class="success-title" id="success-title">¡Registro<br><span>completado!</span> 🎉</div>
-  <!-- Subtítulo -->
+  <div class="success-title">¡Todo enviado<br><span>con éxito!</span> 🎉</div>
   <div class="success-sub" id="success-sub">
-    Tu empresa fue registrada correctamente.<br>
-    <span style="color:rgba(255,255,255,.7)">Cuando necesites subir documentación, ingresa con tu RUC y correo.</span>
+    Tus documentos llegaron a SharePoint y el analista ya fue notificado.<br>
+    <strong style="color:#b4f06e">¡Gracias por confiar en Complejo Agroindustrial Beta!</strong>
   </div>
-  <!-- Metadata -->
   <div class="success-meta" id="success-meta">
+    📁 Carpeta creada correctamente<br>
+    👤 Analista notificado por correo<br>
     ✅ Proceso completado
   </div>
-  <!-- Chips de estado -->
-  <div class="success-chips" id="success-chips">
-    <span class="success-chip" id="chip1">✓ Carpeta creada</span>
-    <span class="success-chip" id="chip2">✓ SharePoint actualizado</span>
-    <span class="success-chip" id="chip3">✓ Notificación enviada</span>
+  <div class="success-chips">
+    <span class="success-chip">✓ Documentos recibidos</span>
+    <span class="success-chip">✓ SharePoint actualizado</span>
+    <span class="success-chip">✓ Notificación enviada</span>
   </div>
-  <!-- Botón -->
-  <button class="success-btn" id="success-main-btn" onclick="cerrarExito()">
+  <button class="success-btn" onclick="cerrarExito()">
     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     Volver al inicio
   </button>
@@ -1244,11 +1240,11 @@ function clearOtp() {
    COUNTDOWN OTP
    ════════════════════════════════════════════════════════ */
 let otpInterval = null;
-let otpSeconds = 120;
+let otpSeconds = 600;
 
 function startOtpCountdown() {
   clearInterval(otpInterval);
-  otpSeconds = 120;
+  otpSeconds = 600;
   document.getElementById('otp-timer-wrap').style.display = 'block';
   document.getElementById('otp-resend-wrap').style.display = 'none';
   updateOtpDisplay();
@@ -1373,8 +1369,8 @@ async function submitRegistro() {
     SESSION = { ruc, email, razonSocial: razon, categoria: cat, carpeta: `${CFG.BASE_PATH}/${cat}/${analista}/${ruc}_${razon}`, analista, modo: 'nuevo' };
 
     hideAlert('reg-alert');
-    // Ir a pantalla OTP — al verificar mostrará éxito de registro
-    mostrarOtp(email);
+    // Mostrar pantalla de éxito de registro y volver al inicio
+    mostrarExitoRegistro(razon);
 
   } catch(e) {
     showAlert('reg-alert','error','Error al registrar: ' + e.message);
@@ -1575,13 +1571,7 @@ async function verificarOtp() {
 
     clearInterval(otpInterval);
     hideAlert('otp-alert');
-    // Si es registro nuevo → pantalla de éxito de registro
-    // Si es login existente → ir a documentos
-    if (SESSION.modo === 'nuevo') {
-      mostrarExitoRegistro(SESSION.razonSocial || SESSION.ruc);
-    } else {
-      accederDocumentos();
-    }
+    mostrarExitoOTP();
 
   } catch(e) {
     showAlert('otp-alert','error','Error al verificar: ' + e.message);
@@ -1791,74 +1781,104 @@ async function submitDocumentos() {
 /* ════════════════════════════════════════════════════════
    ÉXITO DE REGISTRO — vuelve al inicio
    ════════════════════════════════════════════════════════ */
+
+
 /* ════════════════════════════════════════════════════════
    ÉXITO DE REGISTRO — vuelve al inicio
    ════════════════════════════════════════════════════════ */
 function mostrarExitoRegistro(razonSocial) {
-  // Título
-  document.getElementById('success-title').innerHTML = '¡Registro<br><span>completado!</span> 🎉';
-
-  // Subtítulo
-  document.getElementById('success-sub').innerHTML =
-    `Bienvenido al sistema, <strong style="color:#b4f06e">${razonSocial}</strong>.<br>
-    <span style="color:rgba(255,255,255,.7)">Cuando necesites subir documentación, ingresa con tu RUC y correo desde la pantalla principal.</span>`;
-
-  // Meta
-  document.getElementById('success-meta').innerHTML =
+  const meta = document.getElementById('success-meta');
+  meta.innerHTML =
     `🏢 <strong>${razonSocial}</strong><br>` +
+    `✅ Registro completado exitosamente<br>` +
     `📁 Carpeta creada en SharePoint<br>` +
-    `📧 Código de verificación enviado a tu correo<br>` +
+    `📧 Revisa tu correo — te enviamos la confirmación<br>` +
     `📅 ${new Date().toLocaleDateString('es-PE',{day:'2-digit',month:'long',year:'numeric'})}`;
 
-  // Chips
-  document.getElementById('chip1').textContent = '✓ Empresa registrada';
-  document.getElementById('chip2').textContent = '✓ Carpeta SharePoint creada';
-  document.getElementById('chip3').textContent = '✓ Correo enviado';
-
-  // Botón volver al inicio
-  const btn = document.getElementById('success-main-btn');
-  btn.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Volver al inicio`;
-  btn.onclick = () => {
-    document.getElementById('screen-success').classList.remove('show');
-    document.querySelectorAll('.confetti-piece').forEach(el => el.remove());
-    SESSION = { ruc:'', email:'', razonSocial:'', carpeta:'', analista:'', modo:'' };
-    document.getElementById('nav-session').style.display = 'none';
-    irA('screen-entry');
-  };
+  const sub = document.getElementById('success-sub');
+  sub.innerHTML =
+    `Tu empresa fue registrada correctamente en el Portal Proveedores Beta.<br>` +
+    `<span style="color:rgba(255,255,255,.7)">Cuando necesites subir documentación, ingresa con tu RUC y correo desde la pantalla principal.</span>`;
 
   document.getElementById('screen-success').classList.add('show');
   window.scrollTo({ top: 0 });
   lanzarConfeti();
+
+  // Volver al inicio automáticamente al cerrar
+  const btnCerrar = document.querySelector('.success-btn');
+  if (btnCerrar) {
+    btnCerrar.textContent = '← Volver al inicio';
+    btnCerrar.onclick = () => {
+      document.getElementById('screen-success').classList.remove('show');
+      document.querySelectorAll('.confetti-piece').forEach(el => el.remove());
+      SESSION = { ruc:'', email:'', razonSocial:'', carpeta:'', analista:'', modo:'' };
+      document.getElementById('nav-session').style.display = 'none';
+      irA('screen-entry');
+    };
+  }
 }
 
 /* ════════════════════════════════════════════════════════
-   PANTALLA DE ÉXITO + CONFETI (subida de documentos)
+   ÉXITO DESPUÉS DE VERIFICAR OTP
+   ════════════════════════════════════════════════════════ */
+function mostrarExitoOTP() {
+  const esNuevo = SESSION.modo === 'nuevo';
+
+  const meta = document.getElementById('success-meta');
+  meta.innerHTML = esNuevo
+    ? `🏢 <strong>${SESSION.razonSocial || SESSION.ruc}</strong><br>` +
+      `✅ Identidad verificada correctamente<br>` +
+      `📁 Carpeta creada en SharePoint<br>` +
+      `📅 ${new Date().toLocaleDateString('es-PE',{day:'2-digit',month:'long',year:'numeric'})}`
+    : `🏢 <strong>${SESSION.razonSocial || SESSION.ruc}</strong><br>` +
+      `✅ Código verificado correctamente<br>` +
+      `👤 Analista: <strong>${SESSION.analista || ''}</strong><br>` +
+      `📅 ${new Date().toLocaleDateString('es-PE',{day:'2-digit',month:'long',year:'numeric'})}`;
+
+  const sub = document.getElementById('success-sub');
+  sub.innerHTML = esNuevo
+    ? `¡Bienvenido al sistema! Tu empresa quedó registrada.<br>
+       <span style="color:rgba(255,255,255,.7)">Cuando necesites subir documentación, ingresa con tu RUC y correo.</span>`
+    : `Tu sesión fue verificada exitosamente.<br>
+       <span style="color:rgba(255,255,255,.7)">¡Gracias por confiar en Complejo Agroindustrial Beta!</span>`;
+
+  document.getElementById('screen-success').classList.add('show');
+  window.scrollTo({ top: 0 });
+  lanzarConfeti();
+
+  const btnCerrar = document.querySelector('.success-btn');
+  if (btnCerrar) {
+    btnCerrar.textContent = esNuevo ? '← Volver al inicio' : '📁 Ir a documentos';
+    btnCerrar.onclick = () => {
+      document.getElementById('screen-success').classList.remove('show');
+      document.querySelectorAll('.confetti-piece').forEach(el => el.remove());
+      if (esNuevo) {
+        SESSION = { ruc:'', email:'', razonSocial:'', carpeta:'', analista:'', modo:'' };
+        document.getElementById('nav-session').style.display = 'none';
+        irA('screen-entry');
+      } else {
+        accederDocumentos();
+      }
+    };
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   PANTALLA DE ÉXITO + CONFETI
    ════════════════════════════════════════════════════════ */
 function showExito(numArchivos) {
-  // Título
-  document.getElementById('success-title').innerHTML = '¡Documentos<br><span>enviados!</span> 🎉';
-
-  // Subtítulo
-  document.getElementById('success-sub').innerHTML =
-    `Tus documentos llegaron a SharePoint y <strong style="color:#b4f06e">${SESSION.analista || 'el analista'}</strong> ya fue notificado.<br>
-    <span style="color:rgba(255,255,255,.7)">¡Gracias por confiar en Complejo Agroindustrial Beta!</span>`;
-
-  // Meta
-  document.getElementById('success-meta').innerHTML =
-    `🏢 <strong>${SESSION.razonSocial || SESSION.ruc}</strong><br>` +
+  // Actualizar meta info
+  const meta = document.getElementById('success-meta');
+  meta.innerHTML =
+    `📁 <strong>${SESSION.carpeta || 'Carpeta SharePoint'}</strong><br>` +
     `📄 <strong>${numArchivos} archivo(s)</strong> enviados correctamente<br>` +
-    `👤 Analista <strong>${SESSION.analista || ''}</strong> notificado<br>` +
-    `📅 ${new Date().toLocaleDateString('es-PE',{day:'2-digit',month:'long',year:'numeric'})}`;
+    `👤 Analista <strong>${SESSION.analista || ''}</strong> notificado por correo<br>` +
+    `✅ Proceso completado — ${new Date().toLocaleDateString('es-PE',{day:'2-digit',month:'long',year:'numeric'})}`;
 
-  // Chips
-  document.getElementById('chip1').textContent = '✓ Documentos recibidos';
-  document.getElementById('chip2').textContent = '✓ SharePoint actualizado';
-  document.getElementById('chip3').textContent = '✓ Analista notificado';
-
-  // Botón cerrar sesión
-  const btn = document.getElementById('success-main-btn');
-  btn.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Volver al inicio`;
-  btn.onclick = cerrarExito;
+  const sub = document.getElementById('success-sub');
+  sub.innerHTML =
+    `Tus documentos llegaron a SharePoint y <strong style="color:#b4f06e">${SESSION.analista || 'el analista'}</strong> ya fue notificado.<br>` +
+    `<span style="color:rgba(255,255,255,.7)">¡Gracias por confiar en Complejo Agroindustrial Beta!</span>`;
 
   document.getElementById('screen-success').classList.add('show');
   window.scrollTo({ top: 0 });
