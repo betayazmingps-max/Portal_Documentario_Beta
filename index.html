@@ -1373,8 +1373,8 @@ async function submitRegistro() {
     SESSION = { ruc, email, razonSocial: razon, categoria: cat, carpeta: `${CFG.BASE_PATH}/${cat}/${analista}/${ruc}_${razon}`, analista, modo: 'nuevo' };
 
     hideAlert('reg-alert');
-    // Mostrar pantalla de éxito de registro y volver al inicio
-    mostrarExitoRegistro(razon);
+    // Ir a pantalla OTP — al verificar mostrará éxito de registro
+    mostrarOtp(email);
 
   } catch(e) {
     showAlert('reg-alert','error','Error al registrar: ' + e.message);
@@ -1575,7 +1575,13 @@ async function verificarOtp() {
 
     clearInterval(otpInterval);
     hideAlert('otp-alert');
-    accederDocumentos();
+    // Si es registro nuevo → pantalla de éxito de registro
+    // Si es login existente → ir a documentos
+    if (SESSION.modo === 'nuevo') {
+      mostrarExitoRegistro(SESSION.razonSocial || SESSION.ruc);
+    } else {
+      accederDocumentos();
+    }
 
   } catch(e) {
     showAlert('otp-alert','error','Error al verificar: ' + e.message);
