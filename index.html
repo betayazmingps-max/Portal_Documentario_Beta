@@ -1459,13 +1459,23 @@ async function submitRegistro() {
       crear_carpeta_fiscal: true
     };
 
+    showAlert('reg-alert','loading','Creando carpeta en SharePoint...');
     const result = await callFlow(CFG.FLOW_REGISTRAR, payload);
+
+    // Validar que el flujo realmente creó la carpeta
+    if (!result || result.error || result.ok === false) {
+      throw new Error(result?.error || result?.message || 'El flujo de registro no respondió correctamente. Verifica Power Automate.');
+    }
 
     SESSION = { ruc, email, razonSocial: razon, categoria: cat, carpeta: `${CFG.BASE_PATH}/${cat}/${analista}/${ruc}_${razon}`, analista, modo: 'nuevo' };
 
+    // Carpeta creada — ahora enviar OTP para verificar identidad
+    showAlert('reg-alert','loading','Carpeta creada ✓ — Enviando código de verificación...');
+    await callFlow(CFG.FLOW_ENVIAR_OTP, { ruc, email, contacto });
+
     hideAlert('reg-alert');
-    // Mostrar pantalla de éxito de registro y volver al inicio
-    mostrarExitoRegistro(razon);
+    // Ir a pantalla OTP (la verificación confirma el acceso)
+    mostrarOtp(email);
 
   } catch(e) {
     showAlert('reg-alert','error','Error al registrar: ' + e.message);
@@ -1985,7 +1995,7 @@ function mostrarExitoOTP() {
   meta.innerHTML = esNuevo
     ? `🏢 <strong>${SESSION.razonSocial || SESSION.ruc}</strong><br>` +
       `✅ Identidad verificada correctamente<br>` +
-      `📁 Carpeta creada en SharePoint<br>` +
+      `📁 Carpeta creada: <strong style="font-size:11px">${SESSION.carpeta || 'SharePoint'}</strong><br>` +
       `📅 ${new Date().toLocaleDateString('es-PE',{day:'2-digit',month:'long',year:'numeric'})}`
     : `🏢 <strong>${SESSION.razonSocial || SESSION.ruc}</strong><br>` +
       `✅ Código verificado correctamente<br>` +
@@ -2005,17 +2015,12 @@ function mostrarExitoOTP() {
 
   const btnCerrar = document.querySelector('.success-btn');
   if (btnCerrar) {
-    btnCerrar.textContent = esNuevo ? '← Volver al inicio' : '📁 Ir a documentos';
+    btnCerrar.textContent = esNuevo ? '📁 Ir a mis documentos' : '📁 Ir a documentos';
     btnCerrar.onclick = () => {
       document.getElementById('screen-success').classList.remove('show');
       document.querySelectorAll('.confetti-piece').forEach(el => el.remove());
-      if (esNuevo) {
-        SESSION = { ruc:'', email:'', razonSocial:'', carpeta:'', analista:'', modo:'' };
-        document.getElementById('nav-session').style.display = 'none';
-        irA('screen-entry');
-      } else {
-        accederDocumentos();
-      }
+      // Tanto nuevo como existente van a documentos
+      accederDocumentos();
     };
   }
 }
