@@ -1368,9 +1368,10 @@ async function submitRegistro() {
 
     SESSION = { ruc, email, razonSocial: razon, categoria: cat, carpeta: `${CFG.BASE_PATH}/${cat}/${analista}/${ruc}_${razon}`, analista, modo: 'nuevo' };
 
+    showAlert('reg-alert','loading','Enviando código de verificación a tu correo...');
+    await callFlow(CFG.FLOW_ENVIAR_OTP, { ruc, email, contacto: razon, modo: 'nuevo', razonSocial: razon, analista, categoria: cat });
     hideAlert('reg-alert');
-    // Mostrar pantalla de éxito de registro y volver al inicio
-    mostrarExitoRegistro(razon);
+    mostrarOtp(email);
 
   } catch(e) {
     showAlert('reg-alert','error','Error al registrar: ' + e.message);
@@ -1571,7 +1572,11 @@ async function verificarOtp() {
 
     clearInterval(otpInterval);
     hideAlert('otp-alert');
-    mostrarExitoOTP();
+    if (SESSION.modo === 'nuevo') {
+      mostrarExitoRegistro(SESSION.razonSocial);
+    } else {
+      mostrarExitoOTP();
+    }
 
   } catch(e) {
     showAlert('otp-alert','error','Error al verificar: ' + e.message);
