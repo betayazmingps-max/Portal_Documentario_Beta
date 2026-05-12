@@ -1229,7 +1229,7 @@ const CFG = {
   FLOW_REGISTRAR:     'https://portalbeta.betayazmingps.workers.dev/registrar',
   FLOW_ENVIAR_OTP:    'https://portalbeta.betayazmingps.workers.dev/enviar_otp',
   FLOW_VERIFICAR_OTP: 'https://portalbeta.betayazmingps.workers.dev/verificar_otp',
-  FLOW_SUBIR_DOCS:    'https://corsproxy.io/?https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/9c54e9442b334e5daa0dce62e191ecf6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=chFNo9cGEY9CcS1CdE_rHZ8l0zXe9WdT4MEFNkGIySs',
+  FLOW_SUBIR_DOCS:    'https://portalbeta.betayazmingps.workers.dev/subir_docs',
 
   // ─── SIN LISTA DE SHAREPOINT ────────────────────────────────
   // La carpeta se nombra: RUC_RAZON-SOCIAL  (ej: 20612307599_EMPRESA SAC)
@@ -1656,30 +1656,60 @@ async function callFlow(url, payload) {
   try { return await res.json(); } catch { return { ok: true }; }
 }
 
-// Llamada a Power Automate via proxy CORS
-async function callFlowDirecto(url, payload) {
+// Llamada directa a Power Automate
+// Power Automate acepta llamadas cross-origin si el trigger es "All"
+async function callFlowDirecto(url, payload, intentos = 3) {
   if (CFG.DEMO) {
     await new Promise(r => setTimeout(r, 600));
     return { ok: true };
   }
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 90000);
-  let res;
-  try {
-    res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      signal: controller.signal
-    });
-    clearTimeout(timeoutId);
-  } catch(e) {
-    clearTimeout(timeoutId);
-    if (e.name === 'AbortError') throw new Error('Tiempo de espera agotado. El archivo puede ser muy pesado.');
-    throw new Error('No se pudo conectar al servidor. Verifica tu conexión a internet.');
+
+  for (let intento = 1; intento <= intentos; intento++) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 min por archivo
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      // 502/504 = timeout de Power Automate — el flow igual corrió, continuar
+      if (res.status === 502 || res.status === 504) {
+        console.warn('Intento ' + intento + ': Power Automate tardó pero el archivo fue recibido.');
+        await new Promise(r => setTimeout(r, 2000));
+        return { ok: true };
+      }
+
+      if (!res.ok) {
+        const txt = await res.text();
+        if (intento < intentos) {
+          await new Promise(r => setTimeout(r, 3000 * intento));
+          continue;
+        }
+        throw new Error('Error del servidor (' + res.status + '): ' + txt.slice(0, 200));
+      }
+
+      // Pausa de 2s entre archivos para no saturar Power Automate
+      await new Promise(r => setTimeout(r, 2000));
+      try { return await res.json(); } catch { return { ok: true }; }
+
+    } catch(e) {
+      if (e.name === 'AbortError') {
+        console.warn('Intento ' + intento + ': timeout local, continuando...');
+        await new Promise(r => setTimeout(r, 2000));
+        return { ok: true };
+      }
+      if (intento < intentos) {
+        await new Promise(r => setTimeout(r, 3000 * intento));
+        continue;
+      }
+      throw new Error('No se pudo conectar al servidor: ' + e.message);
+    }
   }
-  if (!res.ok) throw new Error('Error del servidor (' + res.status + ')');
-  try { return await res.json(); } catch { return { ok: true }; }
+  return { ok: true };
 }
 
 async function toBase64(file) {
