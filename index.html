@@ -1640,7 +1640,7 @@ async function callFlow(url, payload) {
   let res;
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout por archivo
     res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -2167,37 +2167,40 @@ async function submitDocumentos() {
     // Estructura: BASE_PATH/categoria/analista/RUC_RAZON
     const rutaEmpresa = SESSION.carpeta; // ej: CADENA_DE_SUMINISTROS/2.Compras/TRANSPORTE 2026/Servicios Norte Y Sur/C. REGALADO/20612307599_EMPRESA SAC
 
-    const payload = {
+    // ── Enviar archivo por archivo para evitar timeout del Worker ──
+    const basePayload = {
       ruc:          SESSION.ruc,
       razonSocial:  SESSION.razonSocial,
       email:        SESSION.email,
       analista:     SESSION.analista,
       categoria:    SESSION.categoria,
       obs,
-      archivos,     // cada archivo ya trae: nombre (campo), subcarpeta, entidad
       conductores,
       unidades,
-      // Ruta base de la empresa (el Flow construye: rutaEmpresa/subcarpeta[/entidad])
       ruta_carpeta: rutaEmpresa,
       sitio_sharepoint: 'https://betacompe.sharepoint.com/sites/Intranet',
-      biblioteca:   'Documentos compartidos'
+      biblioteca:   'Documentos compartidos',
+      total_archivos: archivos.length
     };
 
-    showAlert('docs-alert','loading',`Enviando ${archivos.length} archivo(s) a SharePoint...`);
+    let enviados = 0;
+    for (const archivo of archivos) {
+      showAlert('docs-alert','loading',`Subiendo ${enviados + 1} de ${archivos.length}: ${archivo.nombre}...`);
 
-    if (CFG.DEMO) {
-      await new Promise(r => setTimeout(r, 1200));
-      let i = 0;
-      for (const a of archivos) {
-        i++;
-        document.getElementById('prog-fill').style.width = (i/archivos.length*100) + '%';
-        document.getElementById('prog-count').textContent = i + ' / ' + archivos.length;
-        await new Promise(r => setTimeout(r, 400));
+      if (CFG.DEMO) {
+        await new Promise(r => setTimeout(r, 500));
+      } else {
+        await callFlow(CFG.FLOW_SUBIR_DOCS, {
+          ...basePayload,
+          archivos: [archivo],
+          indice: enviados + 1,
+          es_ultimo: enviados + 1 === archivos.length
+        });
       }
-    } else {
-      const res = await callFlow(CFG.FLOW_SUBIR_DOCS, payload);
-      document.getElementById('prog-fill').style.width = '100%';
-      document.getElementById('prog-count').textContent = archivos.length + ' / ' + archivos.length;
+
+      enviados++;
+      document.getElementById('prog-fill').style.width = (enviados / archivos.length * 100) + '%';
+      document.getElementById('prog-count').textContent = enviados + ' / ' + archivos.length;
     }
 
     // Mostrar pantalla de éxito con confeti
