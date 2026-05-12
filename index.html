@@ -1229,7 +1229,7 @@ const CFG = {
   FLOW_REGISTRAR:     'https://portalbeta.betayazmingps.workers.dev/registrar',
   FLOW_ENVIAR_OTP:    'https://portalbeta.betayazmingps.workers.dev/enviar_otp',
   FLOW_VERIFICAR_OTP: 'https://portalbeta.betayazmingps.workers.dev/verificar_otp',
-  FLOW_SUBIR_DOCS:    'https://portalbeta.betayazmingps.workers.dev/subir_docs',
+  FLOW_SUBIR_DOCS:    'https://corsproxy.io/?https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/9c54e9442b334e5daa0dce62e191ecf6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=chFNo9cGEY9CcS1CdE_rHZ8l0zXe9WdT4MEFNkGIySs',
 
   // ─── SIN LISTA DE SHAREPOINT ────────────────────────────────
   // La carpeta se nombra: RUC_RAZON-SOCIAL  (ej: 20612307599_EMPRESA SAC)
@@ -1656,18 +1656,16 @@ async function callFlow(url, payload) {
   try { return await res.json(); } catch { return { ok: true }; }
 }
 
-// Llamada directa a Power Automate
-// Power Automate acepta llamadas cross-origin si el trigger es "All"
+// Llamada a Power Automate via proxy CORS
 async function callFlowDirecto(url, payload) {
   if (CFG.DEMO) {
     await new Promise(r => setTimeout(r, 600));
     return { ok: true };
   }
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 90000);
   let res;
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 90000);
-    // Intentar primero con cors normal
     res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1676,26 +1674,11 @@ async function callFlowDirecto(url, payload) {
     });
     clearTimeout(timeoutId);
   } catch(e) {
-    if (e.name === 'AbortError') {
-      throw new Error('Tiempo de espera agotado. El archivo puede ser muy pesado, intenta con uno más pequeño.');
-    }
-    // Si falla por CORS, intentar con no-cors (el flow igual corre)
-    try {
-      const controller2 = new AbortController();
-      const timeoutId2 = setTimeout(() => controller2.abort(), 90000);
-      await fetch(url, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: JSON.stringify(payload),
-        signal: controller2.signal
-      });
-      clearTimeout(timeoutId2);
-      return { ok: true };
-    } catch(e2) {
-      throw new Error('No se pudo conectar a Power Automate. Verifica tu conexión a internet.');
-    }
+    clearTimeout(timeoutId);
+    if (e.name === 'AbortError') throw new Error('Tiempo de espera agotado. El archivo puede ser muy pesado.');
+    throw new Error('No se pudo conectar al servidor. Verifica tu conexión a internet.');
   }
-  // Si llegamos aquí, la llamada cors funcionó
+  if (!res.ok) throw new Error('Error del servidor (' + res.status + ')');
   try { return await res.json(); } catch { return { ok: true }; }
 }
 
