@@ -1828,8 +1828,9 @@ async function solicitarOtpLogin() {
       }
       SESSION = { ruc, email,
         razonSocial: verificacion.razonSocial || '',
-        carpeta:     verificacion.carpeta     || '',
+        carpeta:     verificacion.ruta_carpeta || verificacion.carpeta || '',
         analista:    verificacion.analista    || '',
+        categoria:   verificacion.categoria   || '',
         modo: 'existente'
       };
       showAlert('login-alert','loading','RUC verificado. Enviando código de verificación...');
