@@ -2167,6 +2167,19 @@ async function submitDocumentos() {
     // Estructura: BASE_PATH/categoria/analista/RUC_RAZON
     const rutaEmpresa = SESSION.carpeta; // ej: CADENA_DE_SUMINISTROS/2.Compras/TRANSPORTE 2026/Servicios Norte Y Sur/C. REGALADO/20612307599_EMPRESA SAC
 
+    // ── Descomponer la ruta en partes para que el Flow las use correctamente ──
+    // SESSION.carpeta ej: "CADENA_DE_SUMINISTROS/2.Compras/TRANSPORTE 2026/Servicios Norte Y Sur/C. REGALADO/20612307599_EMPRESA SAC"
+    const partesRuta = (rutaEmpresa || '').split('/').map(p => p.trim()).filter(Boolean);
+    // Estructura esperada: [area, subarea, campania, categoria, analista, carpeta_empresa]
+    const rutaPartes = {
+      area:             partesRuta[0] || '',
+      subarea:          partesRuta[1] || '',
+      campania:         partesRuta[2] || '',
+      categoria:        partesRuta[3] || SESSION.categoria || '',
+      analista:         partesRuta[4] || SESSION.analista  || '',
+      carpeta_empresa:  partesRuta[5] || (SESSION.ruc + '_' + SESSION.razonSocial)
+    };
+
     // ── Enviar archivo por archivo para evitar timeout del Worker ──
     const basePayload = {
       ruc:          SESSION.ruc,
@@ -2177,7 +2190,15 @@ async function submitDocumentos() {
       obs,
       conductores,
       unidades,
+      // Ruta completa (por compatibilidad)
       ruta_carpeta: rutaEmpresa,
+      // Partes separadas — úsalas en el Flow para armar la ruta paso a paso
+      ruta_area:            rutaPartes.area,
+      ruta_subarea:         rutaPartes.subarea,
+      ruta_campania:        rutaPartes.campania,
+      ruta_categoria:       rutaPartes.categoria,
+      ruta_analista:        rutaPartes.analista,
+      ruta_carpeta_empresa: rutaPartes.carpeta_empresa,
       sitio_sharepoint: 'https://betacompe.sharepoint.com/sites/Intranet',
       biblioteca:   'Documentos compartidos',
       total_archivos: archivos.length
