@@ -105,6 +105,25 @@ async function handleRequest(request) {
     }
   }
 
+  // ── Ruta: POST al Google Sheet (aprobar, rechazar, notas, AI) ──
+  if (path === 'sheet') {
+    try {
+      const body = await request.text();
+      const SHEET_URL = 'https://script.google.com/macros/s/AKfycbw_Fwj-pT-2NBB0w87h0dp2od9vWa4jMglXC773ThwqbrTsf3IRij-tx4amd4_RrF4eKg/exec';
+      const res  = await fetch(SHEET_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        redirect: 'follow',
+        body
+      });
+      const text = await res.text();
+      let data; try { data = JSON.parse(text); } catch { data = { ok: true }; }
+      return new Response(JSON.stringify(data), { status: 200, headers: CORS });
+    } catch(err) {
+      return new Response(JSON.stringify({ ok: false, error: err.message }), { status: 500, headers: CORS });
+    }
+  }
+
   // ── Ruta: analizar documento con Claude IA ────────────────
   if (path === 'analizar_doc') {
     try {
