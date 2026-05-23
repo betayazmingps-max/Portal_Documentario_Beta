@@ -85,6 +85,21 @@ async function handleRequest(request) {
     }
   }
 
+  // ── Ruta especial: listar proveedores desde Google Sheet ──
+  if (path === 'listar') {
+    try {
+      const body     = await request.json().catch(() => ({}));
+      const analista = body.analista || 'TODOS';
+      const sheetUrl = 'https://script.google.com/macros/s/AKfycbw_Fwj-pT-2NBB0w87h0dp2od9vWa4jMglXC773ThwqbrTsf3IRij-tx4amd4_RrF4eKg/exec'
+        + '?action=listar&analista=' + encodeURIComponent(analista);
+      const res  = await fetch(sheetUrl, { redirect: 'follow' });
+      const data = await res.json();
+      return new Response(JSON.stringify(data), { status: 200, headers: CORS });
+    } catch(err) {
+      return new Response(JSON.stringify({ ok: false, error: err.message }), { status: 500, headers: CORS });
+    }
+  }
+
   // ── Rutas de Power Automate ────────────────────────────────
   const flowUrl = FLOWS[path];
   if (!flowUrl) {
