@@ -199,7 +199,9 @@ Reglas: valido=true si corresponde al campo. nitido=true si se lee bien. Sé fle
         const token = body.token || '';
         if (ruc.length !== 11) return resp({ error: 'RUC inválido' }, 400);
 
-        const authH = token ? { Authorization: 'Bearer ' + token } : {};
+        // Usar token del env (secret en Cloudflare) — si el frontend manda uno se ignora
+        const apiToken = env.APIS_NET_PE_TOKEN || token || '';
+        const authH = apiToken ? { Authorization: 'Bearer ' + apiToken } : {};
 
         for (const url of [
           `https://api.apis.net.pe/v2/sunat/ruc?numero=${ruc}`,
@@ -229,6 +231,40 @@ Reglas: valido=true si corresponde al campo. nitido=true si se lee bien. Sé fle
         } catch {}
 
         return resp({ error: 'RUC no encontrado en SUNAT' }, 404);
+      }
+
+      // ══════════════════════════════════════════════════════════
+      //  🔍 VERIFICAR PROVEEDOR (login de ingresar.html)
+      //  Solo devuelve datos del proveedor buscado — no expone la lista completa
+      // ══════════════════════════════════════════════════════════
+      if (path === 'verificar_proveedor') {
+        const { ruc, email } = body;
+        if (!ruc || !email) return resp({ ok: false, error: 'RUC y email requeridos' }, 400);
+
+        const sheetUrl = GSHEET_URL + '?action=listar&analista=TODOS';
+        const res      = await fetch(sheetUrl, { redirect: 'follow' });
+        const data     = await res.json();
+        const proveedores = data.proveedores || [];
+
+        const prov = proveedores.find(p =>
+          String(p.ruc) === String(ruc) &&
+          String(p.email).toLowerCase() === String(email).toLowerCase()
+        );
+
+        if (!prov) return resp({ ok: false, error: 'RUC o correo no encontrado.\nVerifica tus datos o contáctate con tu analista.' }, 404);
+
+        // Solo devolver los campos necesarios — nunca la lista completa
+        return resp({
+          ok: true,
+          proveedor: {
+            ruc:         prov.ruc,
+            razonSocial: prov.razonSocial,
+            carpeta:     prov.carpeta     || '',
+            analista:    prov.analista    || '',
+            categoria:   prov.categoria   || '',
+            estado:      prov.estado      || 'pendiente',
+          }
+        });
       }
 
       // ══════════════════════════════════════════════════════════
