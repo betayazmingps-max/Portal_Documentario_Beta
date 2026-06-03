@@ -254,8 +254,14 @@ Reglas: valido=true si corresponde al campo. nitido=true si se lee bien. Sé fle
       //  📨 NOTIFICAR ANALISTA — avisa cuando llega un nuevo registro
       // ══════════════════════════════════════════════════════════
       if (path === 'notificar_analista') {
-        const { analista, email_analista, ruc, razonSocial, categoria, email_proveedor } = body;
-        if (!email_analista) return resp({ ok: true, skipped: 'sin email analista' });
+        const { analista, ruc, razonSocial, categoria, email_proveedor } = body;
+
+        // Leer emails de analistas desde env (secret ANALISTAS_EMAILS_JSON)
+        // Formato: {"NORTE":"norte@beta.com","SUR":"sur@beta.com","ADMIN":"admin@beta.com"}
+        let emailsMap = {};
+        try { emailsMap = JSON.parse(env.ANALISTAS_EMAILS_JSON || '{}'); } catch {}
+        const email_analista = emailsMap[analista] || '';
+        if (!email_analista) return resp({ ok: true, skipped: `sin email para analista ${analista}` });
 
         const asunto  = `📋 Nuevo proveedor registrado — ${razonSocial}`;
         const htmlMsg = `
