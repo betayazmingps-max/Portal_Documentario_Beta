@@ -234,6 +234,73 @@ Reglas: valido=true si corresponde al campo. nitido=true si se lee bien. Sé fle
       }
 
       // ══════════════════════════════════════════════════════════
+      //  🔎 RUC EXISTE — verifica si un RUC ya está registrado
+      //  Usado en registro.html para evitar duplicados
+      // ══════════════════════════════════════════════════════════
+      if (path === 'ruc_existe') {
+        const { ruc } = body;
+        if (!ruc) return resp({ ok: false, error: 'RUC requerido' }, 400);
+
+        const sheetUrl = GSHEET_URL + '?action=listar&analista=TODOS';
+        const res      = await fetch(sheetUrl, { redirect: 'follow' });
+        const data     = await res.json();
+        const prov     = (data.proveedores || []).find(p => String(p.ruc) === String(ruc));
+
+        if (!prov) return resp({ ok: true, existe: false });
+        return resp({ ok: true, existe: true, estado: prov.estado || 'pendiente', razonSocial: prov.razonSocial });
+      }
+
+      // ══════════════════════════════════════════════════════════
+      //  📨 NOTIFICAR ANALISTA — avisa cuando llega un nuevo registro
+      // ══════════════════════════════════════════════════════════
+      if (path === 'notificar_analista') {
+        const { analista, email_analista, ruc, razonSocial, categoria, email_proveedor } = body;
+        if (!email_analista) return resp({ ok: true, skipped: 'sin email analista' });
+
+        const asunto  = `📋 Nuevo proveedor registrado — ${razonSocial}`;
+        const htmlMsg = `
+          <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;background:#F0EDF8;border-radius:16px;overflow:hidden;border:1px solid #D4CBE8">
+            <div style="background:#5212A0;padding:1.5rem 2rem;border-bottom:3px solid #5BAD1E">
+              <span style="font-size:28px;font-weight:800;color:#fff">bet<span style="color:#79CC38">a</span></span>
+              <p style="color:rgba(255,255,255,.65);font-size:11px;margin-top:3px">Panel Analista</p>
+            </div>
+            <div style="padding:2rem">
+              <p style="font-size:15px;color:#1C0840;font-weight:700;margin-bottom:1rem">Hola, ${analista} 👋</p>
+              <p style="font-size:13px;color:#5C4880;line-height:1.7;margin-bottom:1rem">
+                Un nuevo proveedor completó su registro y está esperando tu revisión:
+              </p>
+              <div style="background:#EDE5FF;border-left:4px solid #5212A0;border-radius:8px;padding:1rem 1.25rem;margin-bottom:1.25rem;font-size:13px;color:#1C0840">
+                🏢 <strong>${razonSocial}</strong><br>
+                🪪 RUC: <code>${ruc}</code><br>
+                📂 Categoría: ${categoria || '—'}<br>
+                📧 Correo: ${email_proveedor || '—'}
+              </div>
+              <p style="font-size:12px;color:#9B89B8">Ingresa al panel para revisar los documentos y tomar una decisión.</p>
+            </div>
+            <div style="background:#1C0840;padding:1rem 2rem;text-align:center">
+              <p style="color:rgba(255,255,255,.35);font-size:10px;margin:0">Portal Proveedores v4.0 · Complejo Agroindustrial Beta S.A.</p>
+            </div>
+          </div>`;
+
+        if (env.RESEND_API_KEY) {
+          for (let i = 1; i <= 3; i++) {
+            try {
+              const r = await fetch('https://api.resend.com/emails', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.RESEND_API_KEY}` },
+                body:    JSON.stringify({ from: env.EMAIL_FROM || 'Portal Beta <noreply@betaagroindustrial.com>', to: [email_analista], subject: asunto, html: htmlMsg }),
+              });
+              if (r.ok) return resp({ ok: true });
+              if (i < 3) await sleep(1000 * i);
+            } catch { if (i < 3) await sleep(1000 * i); }
+          }
+        }
+        // Sin Resend — log y continuar sin error
+        console.log('notificar_analista (sin Resend):', { analista, ruc, razonSocial });
+        return resp({ ok: true, skipped: 'sin RESEND_API_KEY' });
+      }
+
+      // ══════════════════════════════════════════════════════════
       //  🔍 VERIFICAR PROVEEDOR (login de ingresar.html)
       //  Solo devuelve datos del proveedor buscado — no expone la lista completa
       // ══════════════════════════════════════════════════════════
