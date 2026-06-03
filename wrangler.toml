@@ -1,26 +1,3 @@
 name               = "portalbeta"
 main               = "src/index.js"
 compatibility_date = "2024-01-01"
-
-# ── KV Namespace para guardar OTPs temporales ──────────────────
-# Crear con: npx wrangler kv namespace create OTP_STORE
-# Luego pegar el id que devuelve abajo:
-[[kv_namespaces]]
-binding = "OTP_STORE"
-id      = ""   # ← pega aquí el ID del namespace
-
-# ── Secrets (configurar con: npx wrangler secret put NOMBRE) ───
-# Las siguientes variables NUNCA deben ir en este archivo.
-# Configúralas desde la terminal una por una:
-#
-#   npx wrangler secret put ANTHROPIC_API_KEY
-#     → sk-ant-api03-...  (tu API key de Anthropic)
-#
-#   npx wrangler secret put ANALISTAS_JSON
-#     → {"NORTE":{"pass":"TuClave","nombre":"NORTE"},"SUR":{"pass":"TuClave2","nombre":"SUR"},"C. REGALADO":{"pass":"TuClave3","nombre":"C. REGALADO"},"E. ODAR":{"pass":"TuClave4","nombre":"E. ODAR"},"J. PADILLA":{"pass":"TuClave5","nombre":"J. PADILLA"},"ADMIN":{"pass":"AdminClave","nombre":"Administrador"}}
-#
-#   npx wrangler secret put RESEND_API_KEY
-#     → re_...  (opcional, para envío de emails via Resend)
-#
-#   npx wrangler secret put EMAIL_FROM
-#     → Portal Beta <noreply@betaagroindustrial.com>
