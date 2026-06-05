@@ -155,8 +155,11 @@ Reglas: valido=true si corresponde al campo. nitido=true si se lee bien. Sé fle
         // ── Generar y guardar OTP ──────────────────────────────
         const otp    = String(Math.floor(100000 + Math.random() * 900000));
         const expiry = Date.now() + 10 * 60 * 1000;
+        const claveKV = `${ruc}:${email}`;
+        let guardadoOK = false;
         if (env.OTP_STORE) {
-          await env.OTP_STORE.put(`${ruc}:${email}`, JSON.stringify({ otp, expiry }), { expirationTtl: 600 });
+          await env.OTP_STORE.put(claveKV, JSON.stringify({ otp, expiry }), { expirationTtl: 600 });
+          guardadoOK = true;
         }
 
         // ── Enviar por Power Automate ──────────────────────────
@@ -167,7 +170,7 @@ Reglas: valido=true si corresponde al campo. nitido=true si se lee bien. Sé fle
           });
         } catch(e) { console.warn('Flow OTP falló:', e.message); }
 
-        return resp({ ok: true });
+        return resp({ ok: true, _debug: { clave: claveKV, guardado_en_KV: guardadoOK, otp_debug: otp } });
       }
 
       // ══════════════════════════════════════════════════════════
@@ -184,17 +187,18 @@ Reglas: valido=true si corresponde al campo. nitido=true si se lee bien. Sé fle
           try { return resp(JSON.parse(text)); } catch { return resp({ ok: true, valido: true }); }
         }
 
-        const stored = await env.OTP_STORE.get(`${ruc}:${email}`);
-        if (!stored) return resp({ ok: true, valido: false, error: 'OTP expirado o no encontrado' });
+        const claveKV = `${ruc}:${email}`;
+        const stored = await env.OTP_STORE.get(claveKV);
+        if (!stored) return resp({ ok: true, valido: false, error: 'OTP no encontrado', _debug: { clave: claveKV, encontrado: false } });
 
         const { otp: otpGuardado, expiry } = JSON.parse(stored);
         if (Date.now() > expiry) {
-          await env.OTP_STORE.delete(`${ruc}:${email}`);
-          return resp({ ok: true, valido: false, error: 'OTP expirado' });
+          await env.OTP_STORE.delete(claveKV);
+          return resp({ ok: true, valido: false, error: 'OTP expirado', _debug: { vencioHace_seg: Math.round((Date.now()-expiry)/1000) } });
         }
-        if (String(otp) !== String(otpGuardado)) return resp({ ok: true, valido: false, error: 'OTP incorrecto' });
+        if (String(otp) !== String(otpGuardado)) return resp({ ok: true, valido: false, error: 'OTP incorrecto', _debug: { recibido: String(otp), longitud_guardado: String(otpGuardado).length } });
 
-        await env.OTP_STORE.delete(`${ruc}:${email}`);
+        await env.OTP_STORE.delete(claveKV);
         return resp({ ok: true, valido: true });
       }
 
