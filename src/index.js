@@ -23,6 +23,7 @@ const FLOWS = {
   verificar_ruc:  'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/d404ad4b46dd4868a0ac28d09ffe0a0f/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=E4aB_yIFWw5zuisDBfPGyQ7JfZUb0YMzPajUMEZCFA0',
   registrar:      'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/1e3f6e1392b94114b1043c46d7ef9457/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=uFn4ZxYV5zhpK__chBgkOSlELJBo1ZwClMWkdulujv4',
   notificar:      'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/1e3f6e1392b94114b1043c46d7ef9457/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=uFn4ZxYV5zhpK__chBgkOSlELJBo1ZwClMWkdulujv4',
+  subir_solicitud: 'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/8d80774c31d447c78285eca11ff35b6d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=L3xNLDMVL931k3hM6C5vr2HcERzBnzRvdCGSrUCDUQk',
   enviar_otp:     'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/1c54e0b04c02472e9bf12b3d5178991f/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0AGZNDg042ZaeupocYn-OKgDLZEg8LIz3nvBu-eBkE0',
   verificar_otp:  'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/be4d3dc86fee423ca46acef1e9846cf1/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=n4IRLz3NSael_eU0Qb2uNdhB2PBHJu8Oki0m_B4ki2w',
   subir_docs:     'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/85ac7787b26e4b3fb69ddb35ab808e73/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=01yjHllYz61knBWikJE7kD4l0ibwkMzWFOwWFAnlS2M',
@@ -490,6 +491,25 @@ Reglas: valido=true si corresponde al campo. nitido=true si se lee bien. Sé fle
             await sleep(1000 * i);
           }
         }
+      }
+
+      // ══════════════════════════════════════════════════════════
+      //  📤 SUBIR SOLICITUD (registro de proveedor → Solicitudes_Proveedores)
+      //  Endpoint dedicado al Flow nuevo SubirSolicitud (no toca docs aprobados)
+      // ══════════════════════════════════════════════════════════
+      if (path === 'subir_solicitud') {
+        const flowUrl = FLOWS.subir_solicitud;
+        if (!flowUrl) return resp({ ok: false, error: 'Flow SubirSolicitud no configurado' }, 500);
+
+        // Fire-and-forget: respondemos inmediato, el Flow sigue en segundo plano
+        const promesa = fetch(flowUrl, {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    rawBody,
+        }).catch(e => console.warn('subir_solicitud error:', e.message));
+
+        ctx.waitUntil(promesa);
+        return resp({ ok: true });
       }
 
       // ══════════════════════════════════════════════════════════
