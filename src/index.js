@@ -285,7 +285,8 @@ Reglas: valido=true si corresponde al campo. nitido=true si se lee bien. Sé fle
               <p style="font-size:12px;color:#9B89B8">Ingresa al panel para revisar los documentos y tomar una decisión.</p>
             </div>
             <div style="background:#1C0840;padding:1rem 2rem;text-align:center">
-              <p style="color:rgba(255,255,255,.35);font-size:10px;margin:0">Portal Proveedores v4.0 · Complejo Agroindustrial Beta S.A.</p>
+              <p style="color:rgba(255,255,255,.55);font-size:10.5px;margin:0 0 3px">✦ Desarrollado por Ing. Yazmin Atuncar</p>
+            <p style="color:rgba(255,255,255,.3);font-size:9px;margin:0">TI · Portal Proveedores v4.0 · Complejo Agroindustrial Beta S.A.</p>
             </div>
           </div>`;
 
@@ -445,7 +446,8 @@ Reglas: valido=true si corresponde al campo. nitido=true si se lee bien. Sé fle
           </div>
           <div style="padding:2rem">${cuerpoHtml}</div>
           <div style="background:#1C0840;padding:1rem 2rem;text-align:center">
-            <p style="color:rgba(255,255,255,.35);font-size:10px;margin:0">Portal Proveedores v4.0 · Complejo Agroindustrial Beta S.A.</p>
+            <p style="color:rgba(255,255,255,.55);font-size:10.5px;margin:0 0 3px">✦ Desarrollado por Ing. Yazmin Atuncar</p>
+            <p style="color:rgba(255,255,255,.3);font-size:9px;margin:0">TI · Portal Proveedores v4.0 · Complejo Agroindustrial Beta S.A.</p>
           </div>
         </div>`;
 
