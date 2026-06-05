@@ -31,6 +31,9 @@ const FLOWS = {
 
 const GSHEET_URL = 'https://script.google.com/macros/s/AKfycbw_Fwj-pT-2NBB0w87h0dp2od9vWa4jMglXC773ThwqbrTsf3IRij-tx4amd4_RrF4eKg/exec';
 
+// Modelo de Claude para validación de documentos
+const MODELO_IA = 'claude-sonnet-4-5-20250929';
+
 const CORS = {
   'Access-Control-Allow-Origin':  '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -86,10 +89,13 @@ export default {
         if (modo === 'regularizacion' && prompt) {
           const r = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST', headers: aiHeaders,
-            body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 800, messages: [{ role: 'user', content: prompt }] }),
+            body: JSON.stringify({ model: MODELO_IA, max_tokens: 800, messages: [{ role: 'user', content: prompt }] }),
           });
           const d = await r.json();
-          return resp({ ok: true, texto: d.content?.find(c => c.type === 'text')?.text || '{}' });
+          const texto = d.content?.find(c => c.type === 'text')?.text;
+          // Si Claude devolvió error, exponerlo para diagnóstico
+          if (!texto && d.error) return resp({ ok: false, error_claude: d.error });
+          return resp({ ok: true, texto: texto || '{}' });
         }
 
         if (!b64 || !mediaType) return resp({ ok: false, error: 'Faltan datos del archivo' }, 400);
@@ -109,7 +115,7 @@ Reglas: valido=true si corresponde al campo. nitido=true si se lee bien. Sé fle
         const r = await fetch('https://api.anthropic.com/v1/messages', {
           method: 'POST', headers: aiHeaders,
           body: JSON.stringify({
-            model:    'claude-sonnet-4-20250514',
+            model:    MODELO_IA,
             max_tokens: modo === 'simple' ? 150 : 300,
             messages: [{ role: 'user', content: [parteArchivo, { type: 'text', text: modo === 'simple' ? promptSimple : promptCompleto }] }],
           }),
