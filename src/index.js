@@ -282,6 +282,9 @@ Reglas: valido=true si corresponde al campo. nitido=true si se lee bien. Sé fle
                 📂 Categoría: ${categoria || '—'}<br>
                 📧 Correo: ${email_proveedor || '—'}
               </div>
+              <div style="text-align:center;margin:1.5rem 0">
+                <a href="${env.LINK_PANEL || 'https://betayazmingps-max.github.io/PORTAL_BETA/preview.html'}" style="background:#5212A0;color:#fff;padding:14px 32px;border-radius:12px;font-weight:800;font-size:14px;text-decoration:none;display:inline-block">Ir al Panel de Analista →</a>
+              </div>
               <p style="font-size:12px;color:#9B89B8">Ingresa al panel para revisar los documentos y tomar una decisión.</p>
             </div>
             <div style="background:#1C0840;padding:1rem 2rem;text-align:center">
