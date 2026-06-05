@@ -21,7 +21,8 @@
 
 const FLOWS = {
   verificar_ruc:  'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/d404ad4b46dd4868a0ac28d09ffe0a0f/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=E4aB_yIFWw5zuisDBfPGyQ7JfZUb0YMzPajUMEZCFA0',
-  registrar:      'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/0551ca704ec54eeba3e74688050ec1b2/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=U120mc4DgsEBm5HF-k4UbVrMQBru0wLS11tGnID0htk',
+  registrar:      'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/1e3f6e1392b94114b1043c46d7ef9457/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=uFn4ZxYV5zhpK__chBgkOSlELJBo1ZwClMWkdulujv4',
+  notificar:      'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/1e3f6e1392b94114b1043c46d7ef9457/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=uFn4ZxYV5zhpK__chBgkOSlELJBo1ZwClMWkdulujv4',
   enviar_otp:     'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/1c54e0b04c02472e9bf12b3d5178991f/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0AGZNDg042ZaeupocYn-OKgDLZEg8LIz3nvBu-eBkE0',
   verificar_otp:  'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/be4d3dc86fee423ca46acef1e9846cf1/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=n4IRLz3NSael_eU0Qb2uNdhB2PBHJu8Oki0m_B4ki2w',
   subir_docs:     'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/85ac7787b26e4b3fb69ddb35ab808e73/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=01yjHllYz61knBWikJE7kD4l0ibwkMzWFOwWFAnlS2M',
@@ -301,9 +302,18 @@ Reglas: valido=true si corresponde al campo. nitido=true si se lee bien. Sé fle
             } catch { if (i < 3) await sleep(1000 * i); }
           }
         }
-        // Sin Resend — log y continuar sin error
-        console.log('notificar_analista (sin Resend):', { analista, ruc, razonSocial });
-        return resp({ ok: true, skipped: 'sin RESEND_API_KEY' });
+        // Sin Resend → enviar via Flow NotificarProveedor de Power Automate
+        try {
+          await fetchConTimeout(FLOWS.notificar, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ email: email_analista, asunto, htmlEmail: htmlMsg }),
+          }, 15000);
+          return resp({ ok: true });
+        } catch(e) {
+          console.warn('notificar_analista Flow error:', e.message);
+          return resp({ ok: true, skipped: 'no se pudo notificar' });
+        }
       }
 
       // ══════════════════════════════════════════════════════════
@@ -405,8 +415,11 @@ Reglas: valido=true si corresponde al campo. nitido=true si se lee bien. Sé fle
       //  MEJORA: 3 intentos automáticos antes de fallar
       // ══════════════════════════════════════════════════════════
       if (path === 'notificar') {
-        const { email, contacto, razonSocial, ruc, mensaje, linkIngresar, motivo, tipo } = body;
+        const { email, contacto, razonSocial, ruc, mensaje, motivo, tipo } = body;
         if (!email) return resp({ ok: false, error: 'Email requerido' }, 400);
+
+        // Link de ingreso por defecto (si el frontend no lo manda)
+        const linkIngresar = body.linkIngresar || 'https://betayazmingps-max.github.io/PORTAL_BETA/ingresar.html';
 
         const esAprobacion = tipo === 'aprobacion';
         const colorBorde   = esAprobacion ? '#5BAD1E' : '#E02020';
@@ -451,13 +464,13 @@ Reglas: valido=true si corresponde al campo. nitido=true si se lee bien. Sé fle
           }
         }
 
-        // ── Opción B: Power Automate como fallback (con 3 reintentos) ──
+        // ── Opción B: Power Automate (Flow NotificarProveedor) ──
         for (let i = 1; i <= 3; i++) {
           try {
-            await fetchConTimeout(FLOWS.registrar, {
+            await fetchConTimeout(FLOWS.notificar, {
               method:  'POST',
               headers: { 'Content-Type': 'application/json' },
-              body:    JSON.stringify({ email, asunto, htmlEmail, tipo, ruc, razonSocial, contacto, mensaje, motivo, linkIngresar }),
+              body:    JSON.stringify({ email, asunto, htmlEmail }),
             }, 15000);
             return resp({ ok: true });
           } catch(e) {
