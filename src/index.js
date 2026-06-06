@@ -33,7 +33,8 @@ const FLOWS = {
 const GSHEET_URL = 'https://script.google.com/macros/s/AKfycbw_Fwj-pT-2NBB0w87h0dp2od9vWa4jMglXC773ThwqbrTsf3IRij-tx4amd4_RrF4eKg/exec';
 
 // Modelo de Claude para validación de documentos
-const MODELO_IA = 'claude-sonnet-4-5-20250929';
+// Haiku 4.5: ~5x más barato que Sonnet, ideal para validar docs estándar (~$12/año vs $60/año en 200 proveedores)
+const MODELO_IA = 'claude-haiku-4-5-20251001';
 
 const CORS = {
   'Access-Control-Allow-Origin':  '*',
@@ -86,111 +87,47 @@ export default {
           'anthropic-version': '2023-06-01',
         };
 
-        // ─── PROMPT SYSTEM (cacheado, igual para todos los docs) ───
-        // Mínimo 1024 tokens para que se active el cache (Anthropic requirement)
-        // Esto queda en cache 5 min → ahorra 90% en cada llamada posterior
-        const SYSTEM_COMPLETO = [
-          {
-            type: 'text',
-            text: `Eres un validador experto de documentos para Complejo Agroindustrial Beta, empresa peruana del sector agroindustrial y de transporte.
+        // ─── PROMPT SYSTEM (corto y eficiente para Haiku) ───
+        // Sin cache porque cada proveedor sube docs en sesiones separadas (cache de 5 min no aplica)
+        const SYSTEM_COMPLETO = `Eres un validador de documentos para Complejo Agroindustrial Beta (Perú, sector transporte y agroindustria).
 
-CONTEXTO: Los proveedores de transporte de personal y servicios deben presentar documentación para ser aprobados como proveedores. Tu rol es validar que cada documento subido corresponda al campo solicitado, sea legible y extraer datos clave.
+Tu tarea: validar si el documento subido corresponde al campo solicitado, si es legible, y extraer datos clave.
 
-TIPOS DE DOCUMENTOS QUE PUEDES RECIBIR:
-- Documentos legales: Contratos, vigencia de poderes, antecedentes (penales/judiciales/policiales)
-- Identificación: DNI, fotos, brochures empresariales
-- Tributarios: Ficha RUC SUNAT, deuda coactiva, declaraciones juradas
-- Vehiculares: Tarjeta de propiedad, SOAT, RTV (revisión técnica), tarjeta de circulación, póliza vehicular, seguro de responsabilidad civil, seguro de carga
-- Conductores: Licencia de conducir, récord MTC, SCTR, EMO (examen médico ocupacional)
-- Comerciales: Cotizaciones, referencias comerciales, cartas compromiso, brochures
-- Cumplimiento: DDJJ políticas corporativas, normas de seguridad, Lista Clinton
+Sé flexible con los nombres equivalentes:
+- "Vigencia poder" = poder vigente, partida registral SUNARP
+- "Brochure" = dossier, presentación corporativa
+- "SCTR" = póliza/certificado/constancia del seguro complementario
+- "EMO" = examen médico ocupacional, aptitud médica
+- "Antecedentes" = certificado oficial INPE o Poder Judicial
 
-TAREA POR CADA DOCUMENTO:
-1. Verificar si CORRESPONDE al campo solicitado (sé flexible, acepta variantes razonables)
-2. Verificar si es LEGIBLE (no borroso, no cortado, no rayado)
-3. Extraer DATOS CLAVE del documento
-
-FORMATO DE RESPUESTA OBLIGATORIO (JSON puro, SIN markdown, SIN texto extra alrededor):
+Responde SOLO con JSON puro (sin markdown, sin texto extra):
 {
   "valido": true/false,
   "nitido": true/false,
-  "motivo": "texto corto explicando el dictamen",
+  "motivo": "texto corto",
   "datos": {
-    "titular":     "nombre persona/empresa o null",
-    "numero":      "n° doc/placa/RUC/licencia o null",
+    "titular": "nombre persona o empresa, o null",
+    "numero": "n° doc/placa/RUC/licencia, o null",
     "vencimiento": "YYYY-MM-DD o null",
-    "emision":     "YYYY-MM-DD o null",
-    "observacion": "dato adicional relevante o null"
+    "emision": "YYYY-MM-DD o null",
+    "observacion": "dato relevante o null"
   }
 }
 
-REGLAS ESTRICTAS:
-- valido=true: el documento corresponde claramente al campo solicitado
-- valido=false: el documento NO corresponde (ej: pidieron DNI y suben SOAT)
-- nitido=true: se puede leer todo el texto importante
-- nitido=false: borroso, oscuro, ilegible, partes cortadas
-- motivo (válido): di "Documento verificado correctamente"
-- motivo (inválido): di brevemente qué se esperaba y qué se recibió
-- datos.titular: nombre de la persona o empresa que aparece como titular
-- datos.numero: número identificador (DNI, placa, RUC, n° de licencia, etc.)
-- datos.vencimiento: SOLO si el documento tiene fecha de vencimiento explícita
-- datos.emision: SOLO si tiene fecha de emisión/expedición clara
-- datos.observacion: información adicional relevante (categoría licencia, tipo seguro, estado SUNAT, etc.)
-- NO INVENTES datos. Si no estás seguro de un campo, pon null
-- Para fechas, usa formato YYYY-MM-DD estricto
-- Si el documento está parcialmente legible pero el dato clave se ve, marca nitido=true
-
-EJEMPLOS DE INTERPRETACIÓN FLEXIBLE:
-- "Vigencia poder" puede ser: vigencia poder vigente, vigencia poder representante legal, partida registral SUNARP
-- "Brochure" puede ser: brochure, dossier, presentación empresarial, perfil corporativo
-- "Antecedentes penales" debe ser certificado oficial del INPE o Ministerio Público
-- "SCTR" puede ser póliza, certificado o constancia del seguro complementario
-- "EMO" puede ser examen médico ocupacional o aptitud médica
-- "Foto" debe mostrar claramente a la persona o vehículo en cuestión
-
-CASOS LÍMITE:
-- Documento vencido pero del tipo correcto → valido=true, nitido=true, mencionar vencimiento en observacion
-- Documento correcto pero borroso → valido=true, nitido=false
-- Documento incorrecto pero legible → valido=false, nitido=true
-- Captura de pantalla en vez de PDF → aceptar si se lee bien, mencionar en observacion`,
-            cache_control: { type: 'ephemeral' }
-          }
-        ];
-
-        const SYSTEM_SIMPLE = [
-          {
-            type: 'text',
-            text: `Eres un validador de documentos para Complejo Agroindustrial Beta, empresa peruana del sector agroindustrial y transporte.
-
-Tu única tarea es decidir si el documento que recibes corresponde al campo solicitado y si es legible.
-
-CONTEXTO: Los proveedores suben documentos como: contratos, ficha RUC, brochures, vigencia de poder representante legal, antecedentes (penales/judiciales/policiales), DDJJ políticas corporativas, deuda coactiva, cotizaciones, DNI de conductores, licencias de conducir, récord MTC, SCTR, EMO, tarjetas de propiedad, SOAT, RTV, tarjetas de circulación, pólizas vehiculares, seguros, fotos, etc.
-
-INTERPRETACIÓN FLEXIBLE:
-- "Vigencia poder" = vigencia poder, partida registral SUNARP, poder vigente
-- "Brochure" = brochure, dossier, presentación, perfil corporativo
-- "Antecedentes" = certificado oficial INPE o Poder Judicial
-- "SCTR" = póliza, certificado o constancia del seguro complementario
-- "EMO" = examen médico ocupacional, aptitud médica
-- "Foto" = imagen clara de la persona o vehículo
-
-REGLAS DE VALIDACIÓN:
-- valido=true si el documento corresponde claramente al campo (acepta variantes razonables)
-- valido=false si es claramente otro tipo de documento
-- nitido=true si se lee el texto importante
+Reglas:
+- valido=true si corresponde al campo (acepta variantes razonables)
 - nitido=false si está borroso, oscuro o cortado
-- Si está vencido pero es el tipo correcto: valido=true (mencionar en motivo)
-- Captura de pantalla legible: aceptar
+- motivo válido: "Documento verificado"
+- motivo inválido: di brevemente qué se esperaba vs lo recibido
+- NO inventes datos. Si no ves un campo claramente, pon null
+- Fechas en formato YYYY-MM-DD estricto`;
 
-FORMATO DE RESPUESTA (JSON puro, sin markdown, sin texto extra):
-{"valido":true/false,"motivo":"breve","nitido":true/false}
+        const SYSTEM_SIMPLE = `Eres un validador de documentos para Complejo Agroindustrial Beta (Perú).
+Responde SOLO con JSON: {"valido":true/false,"motivo":"breve","nitido":true/false}
 
-motivo válido: "Documento verificado"
-motivo inválido: explicar brevemente qué se recibió en vez del esperado
-motivo no nítido: "Documento poco legible, sube una versión más clara"`,
-            cache_control: { type: 'ephemeral' }
-          }
-        ];
+- valido=true si el documento corresponde al campo solicitado (sé flexible)
+- nitido=false si borroso o ilegible
+- Acepta variantes: SCTR/seguro complementario, EMO/aptitud médica, brochure/dossier, etc.`;
 
         // Modo regularización: solo texto (sin archivo)
         if (modo === 'regularizacion' && prompt) {
@@ -220,7 +157,6 @@ motivo no nítido: "Documento poco legible, sube una versión más clara"`,
           body: JSON.stringify({
             model:    MODELO_IA,
             max_tokens: modo === 'simple' ? 150 : 300,
-            // System cacheado (50% más barato a partir de la 2da llamada)
             system: modo === 'simple' ? SYSTEM_SIMPLE : SYSTEM_COMPLETO,
             messages: [{
               role: 'user',
@@ -236,7 +172,6 @@ motivo no nítido: "Documento poco legible, sube una versión más clara"`,
         return resp({
           ok: true,
           texto: d.content?.find(c => c.type === 'text')?.text || '{}',
-          _usage: d.usage || {},
         });
       }
 
