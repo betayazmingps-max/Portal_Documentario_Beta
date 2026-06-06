@@ -86,29 +86,74 @@ export default {
           'anthropic-version': '2023-06-01',
         };
 
-        // Modo regularización: solo texto
+        // ─── PROMPT SYSTEM (cacheado, igual para todos los docs) ───
+        // Esto se ENVÍA UNA VEZ y queda en cache 5 min → ahorra ~50% en cada llamada
+        const SYSTEM_COMPLETO = [
+          {
+            type: 'text',
+            text: `Eres un validador experto de documentos para una empresa agroindustrial peruana.
+
+TAREA: Recibirás un documento (PDF o imagen) y debes:
+1. Verificar si corresponde al campo solicitado
+2. Verificar si es legible (no borroso)
+3. Extraer datos clave del documento
+
+FORMATO DE RESPUESTA (JSON puro, SIN markdown, SIN texto extra):
+{
+  "valido": true/false,
+  "nitido": true/false,
+  "motivo": "texto corto explicando",
+  "datos": {
+    "titular":     "nombre persona/empresa o null",
+    "numero":      "n° doc/placa/RUC/licencia o null",
+    "vencimiento": "YYYY-MM-DD o null",
+    "emision":     "YYYY-MM-DD o null",
+    "observacion": "dato adicional relevante o null"
+  }
+}
+
+REGLAS:
+- valido=true si el documento corresponde al campo (sé flexible, acepta variantes razonables)
+- nitido=true si se lee bien. false si borroso o ilegible
+- motivo: si válido di "Documento verificado". Si no, explica brevemente qué falta
+- datos: extrae TODO lo que encuentres, aunque el doc sea inválido pon null en lo que no veas
+- NO inventes datos. Si no estás seguro de una fecha, pon null`,
+            cache_control: { type: 'ephemeral' }  // ← clave para que se cachee
+          }
+        ];
+
+        const SYSTEM_SIMPLE = [
+          {
+            type: 'text',
+            text: `Eres un validador de documentos. Recibirás un archivo y debes responder SOLO con JSON:
+{"valido":true/false,"motivo":"texto breve","nitido":true/false}
+
+- valido=true si el documento corresponde al campo solicitado.
+- nitido=true si se lee bien.
+- Sé flexible: acepta variantes razonables.`,
+            cache_control: { type: 'ephemeral' }
+          }
+        ];
+
+        // Modo regularización: solo texto (sin archivo)
         if (modo === 'regularizacion' && prompt) {
           const r = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST', headers: aiHeaders,
-            body: JSON.stringify({ model: MODELO_IA, max_tokens: 800, messages: [{ role: 'user', content: prompt }] }),
+            body: JSON.stringify({
+              model: MODELO_IA,
+              max_tokens: 800,
+              messages: [{ role: 'user', content: prompt }]
+            }),
           });
           const d = await r.json();
           const texto = d.content?.find(c => c.type === 'text')?.text;
-          // Si Claude devolvió error, exponerlo para diagnóstico
           if (!texto && d.error) return resp({ ok: false, error_claude: d.error });
           return resp({ ok: true, texto: texto || '{}' });
         }
 
         if (!b64 || !mediaType) return resp({ ok: false, error: 'Faltan datos del archivo' }, 400);
 
-        const promptCompleto = `Eres un validador de documentos de una empresa agroindustrial peruana.
-El campo solicitado es: "${docName || 'Documento'}"
-Responde ÚNICAMENTE con este JSON (sin texto extra, sin markdown):
-{"valido":true/false,"nitido":true/false,"motivo":"texto corto","datos":{"titular":"o null","numero":"o null","vencimiento":"YYYY-MM-DD o null","emision":"YYYY-MM-DD o null","observacion":"o null"}}
-Reglas: valido=true si corresponde al campo. nitido=true si se lee bien. Sé flexible.`;
-
-        const promptSimple = `Campo: "${docName}". Responde SOLO JSON: {"valido":true/false,"motivo":"texto","nitido":true/false}`;
-
+        // ── Mensaje del usuario: solo el archivo + el campo solicitado ──
         const parteArchivo = isImg
           ? { type: 'image',    source: { type: 'base64', media_type: mediaType, data: b64 } }
           : { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } };
@@ -118,12 +163,27 @@ Reglas: valido=true si corresponde al campo. nitido=true si se lee bien. Sé fle
           body: JSON.stringify({
             model:    MODELO_IA,
             max_tokens: modo === 'simple' ? 150 : 300,
-            messages: [{ role: 'user', content: [parteArchivo, { type: 'text', text: modo === 'simple' ? promptSimple : promptCompleto }] }],
+            // System cacheado (50% más barato a partir de la 2da llamada)
+            system: modo === 'simple' ? SYSTEM_SIMPLE : SYSTEM_COMPLETO,
+            messages: [{
+              role: 'user',
+              content: [
+                parteArchivo,
+                { type: 'text', text: `Campo solicitado: "${docName || 'Documento'}"` }
+              ]
+            }],
           }),
         });
         if (!r.ok) return resp({ ok: false, error: 'Claude error: ' + await r.text() }, 500);
         const d = await r.json();
-        return resp({ ok: true, texto: d.content?.find(c => c.type === 'text')?.text || '{}' });
+        return resp({
+          ok: true,
+          texto: d.content?.find(c => c.type === 'text')?.text || '{}',
+          _cache: {
+            creation_tokens:  d.usage?.cache_creation_input_tokens || 0,
+            cache_hit_tokens: d.usage?.cache_read_input_tokens     || 0,
+          }
+        });
       }
 
       // ══════════════════════════════════════════════════════════
