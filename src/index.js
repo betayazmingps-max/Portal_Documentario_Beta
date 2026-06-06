@@ -236,10 +236,7 @@ motivo no nítido: "Documento poco legible, sube una versión más clara"`,
         return resp({
           ok: true,
           texto: d.content?.find(c => c.type === 'text')?.text || '{}',
-          _cache: {
-            creation_tokens:  d.usage?.cache_creation_input_tokens || 0,
-            cache_hit_tokens: d.usage?.cache_read_input_tokens     || 0,
-          }
+          _usage: d.usage || {},
         });
       }
 
