@@ -352,13 +352,14 @@ Reglas: valido=true si corresponde al campo. nitido=true si se lee bien. Sé fle
         return resp({
           ok: true,
           proveedor: {
-            ruc:               prov.ruc,
-            razonSocial:       prov.razonSocial,
-            carpeta:           prov.carpeta     || '',
-            analista:          prov.analista    || '',
-            categoria:         prov.categoria   || '',
-            estado:            prov.estado      || 'pendiente',
-            docs_obligatorios: prov.docs_obligatorios || [],
+            ruc:                 prov.ruc,
+            razonSocial:         prov.razonSocial,
+            carpeta:             prov.carpeta     || '',
+            analista:            prov.analista    || '',
+            categoria:           prov.categoria   || '',
+            estado:              prov.estado      || 'pendiente',
+            docs_obligatorios:   prov.docs_obligatorios   || [],
+            docs_personalizados: prov.docs_personalizados || [],
           }
         });
       }
