@@ -30,7 +30,7 @@ const FLOWS = {
   crear_carpetas: 'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/0551ca704ec54eeba3e74688050ec1b2/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=U120mc4DgsEBm5HF-k4UbVrMQBru0wLS11tGnID0htk',
 };
 
-const GSHEET_URL = 'https://script.google.com/macros/s/AKfycbzWP1VABmuJz28xR5DUdEF7RuzZ8gM8Tyj4w86jCLJZTbH7nQ2S-lT8lc2xmwX5sQA6wg/exec';
+const GSHEET_URL = 'https://script.google.com/macros/s/AKfycbwOHTbVuTA-VYL_94Be3K4JepbMp4yk37a4LThUJcU5y1mDwq9GLWL6IbKWUgvsY7WjvQ/exec';
 
 // Modelo de Claude para validación de documentos
 // Haiku 4.5: ~5x más barato que Sonnet, ideal para validar docs estándar (~$12/año vs $60/año en 200 proveedores)
