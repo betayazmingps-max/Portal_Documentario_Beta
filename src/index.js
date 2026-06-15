@@ -34,7 +34,7 @@ const GSHEET_URL = 'https://script.google.com/macros/s/AKfycbxJugvYb3C_GA_TQuehn
 
 // Modelo de Claude para validación de documentos
 // Haiku 4.5: ~5x más barato que Sonnet, ideal para validar docs estándar (~$12/año vs $60/año en 200 proveedores)
-const MODELO_IA = 'claude-haiku-4-5-20251001';
+const MODELO_IA = 'claude-sonnet-4-6';
 
 const CORS = {
   'Access-Control-Allow-Origin':  '*',
@@ -178,7 +178,7 @@ Reglas:
           method: 'POST', headers: aiHeaders,
           body: JSON.stringify({
             model:    MODELO_IA,
-            max_tokens: modo === 'simple' ? 150 : 300,
+            max_tokens: modo === 'simple' ? 200 : 600,
             system: modo === 'simple' ? SYSTEM_SIMPLE : SYSTEM_COMPLETO,
             messages: [{
               role: 'user',
