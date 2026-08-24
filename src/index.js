@@ -314,6 +314,47 @@ Reglas:
       }
 
       // ══════════════════════════════════════════════════════════
+      //  🔍 RENIEC DNI — 3 fuentes con fallback automático
+      //  (mismo patrón que sunat_ruc, agregado para Control Documentario)
+      // ══════════════════════════════════════════════════════════
+      if (path === 'sunat_dni') {
+        const dni = (body.dni || '').replace(/\D/g, '').slice(0, 8);
+        if (dni.length !== 8) return resp({ error: 'DNI inválido' }, 400);
+
+        const apiToken = env.APIS_NET_PE_TOKEN || body.token || '';
+        const authH = apiToken ? { Authorization: 'Bearer ' + apiToken } : {};
+
+        for (const url of [
+          `https://api.apis.net.pe/v2/reniec/dni?numero=${dni}`,
+          `https://api.apis.net.pe/v1/dni?numero=${dni}`,
+        ]) {
+          try {
+            const r = await fetch(url, { headers: authH });
+            if (r.ok) {
+              const d = await r.json();
+              if (d && (d.nombres || d.nombre_completo)) return resp(d);
+            }
+          } catch {}
+        }
+
+        // Fallback gratuito
+        try {
+          const r = await fetch(`https://api.apiperu.dev/api/dni/${dni}`);
+          if (r.ok) {
+            const d = await r.json();
+            if (d?.data) return resp({
+              nombres:          d.data.nombres              || '',
+              apellidoPaterno:  d.data.apellido_paterno      || '',
+              apellidoMaterno:  d.data.apellido_materno      || '',
+              nombre_completo:  d.data.nombre_completo       || '',
+            });
+          }
+        } catch {}
+
+        return resp({ error: 'DNI no encontrado en RENIEC' }, 404);
+      }
+
+      // ══════════════════════════════════════════════════════════
       //  🔎 RUC EXISTE — verifica si un RUC ya está registrado
       //  Usado en registro.html para evitar duplicados
       // ══════════════════════════════════════════════════════════
