@@ -373,6 +373,82 @@ Reglas:
       }
 
       // ══════════════════════════════════════════════════════════
+      //  🧪 CONSULTADATOS.COM — endpoints de PRUEBA (Plan Standard + Maestro)
+      //  Solo para comparar contra json.pe / apis.net.pe / apiperu.dev.
+      //  No reemplazan sunat_ruc / sunat_dni todavía — son rutas nuevas.
+      //  Token: env.CONSULTADATOS_TOKEN (recomendado moverlo a Cloudflare Secrets)
+      // ══════════════════════════════════════════════════════════
+      const CD_TOKEN = env.CONSULTADATOS_TOKEN || 'tr_aa92e6e2822c1c71809a3f95dfd01a48';
+
+      async function consultaCD(url) {
+        const r = await fetch(url, { headers: { Authorization: 'Bearer ' + CD_TOKEN, Accept: 'application/json' } });
+        const text = await r.text();
+        let d = {};
+        try { d = JSON.parse(text); } catch {}
+        return { ok: r.ok, status: r.status, data: d, raw: text };
+      }
+
+      // 🆔 DNI — ConsultaDatos (prueba)
+      if (path === 'consulta_dni_cd') {
+        const dni = (body.dni || '').replace(/\D/g, '').slice(0, 8);
+        if (dni.length !== 8) return resp({ ok: false, error: 'DNI inválido' }, 400);
+        try {
+          const { ok, status, data, raw } = await consultaCD(`https://api2.consultadatos.com/api/dni/${dni}`);
+          if (ok && data.NOMBRES) return resp({ ok: true, ...data });
+          if (status === 402 || status === 403) return resp({ ok: false, error: 'Créditos agotados o plan insuficiente', http: status }, 402);
+          return resp({ ok: false, error: data.message || 'DNI no encontrado', http: status, raw: raw.slice(0,200) }, 404);
+        } catch(e) { return resp({ ok: false, error: 'Error: ' + e.message }, 500); }
+      }
+
+      // 🏢 RUC — ConsultaDatos (prueba)
+      if (path === 'consulta_ruc_cd') {
+        const ruc = (body.ruc || '').replace(/\D/g, '').slice(0, 11);
+        if (ruc.length !== 11) return resp({ ok: false, error: 'RUC inválido' }, 400);
+        try {
+          const { ok, status, data, raw } = await consultaCD(`https://api2.consultadatos.com/api/ruc/${ruc}`);
+          if (ok && data.success && data.data) return resp({ ok: true, ...data.data });
+          if (status === 402 || status === 403) return resp({ ok: false, error: 'Créditos agotados o plan insuficiente', http: status }, 402);
+          return resp({ ok: false, error: data.message || 'RUC no encontrado', http: status, raw: raw.slice(0,200) }, 404);
+        } catch(e) { return resp({ ok: false, error: 'Error: ' + e.message }, 500); }
+      }
+
+      // 🪪 LICENCIA DE CONDUCIR — ConsultaDatos (prueba, por DNI)
+      if (path === 'consulta_licencia') {
+        const dni = (body.dni || '').replace(/\D/g, '').slice(0, 8);
+        if (dni.length !== 8) return resp({ ok: false, error: 'DNI inválido' }, 400);
+        try {
+          const { ok, status, data, raw } = await consultaCD(`https://api2.consultadatos.com/api/licencia/${dni}`);
+          if (ok && data.success && data.data) return resp({ ok: true, ...data.data });
+          if (status === 402 || status === 403) return resp({ ok: false, error: 'Créditos agotados o plan insuficiente', http: status }, 402);
+          return resp({ ok: false, error: data.message || 'Licencia no encontrada', http: status, raw: raw.slice(0,200) }, 404);
+        } catch(e) { return resp({ ok: false, error: 'Error: ' + e.message }, 500); }
+      }
+
+      // 🛡️ SOAT — ConsultaDatos (prueba, por placa)
+      if (path === 'consulta_soat') {
+        const placa = (body.placa || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7);
+        if (!placa) return resp({ ok: false, error: 'Placa inválida' }, 400);
+        try {
+          const { ok, status, data, raw } = await consultaCD(`https://api2.consultadatos.com/api/placa/soat/${placa}`);
+          if (ok && data.data) return resp({ ok: true, ...data.data });
+          if (status === 402 || status === 403) return resp({ ok: false, error: 'Créditos agotados o plan insuficiente', http: status }, 402);
+          return resp({ ok: false, error: data.message || 'SOAT no encontrado', http: status, raw: raw.slice(0,200) }, 404);
+        } catch(e) { return resp({ ok: false, error: 'Error: ' + e.message }, 500); }
+      }
+
+      // 🚗 REVISIÓN TÉCNICA (CITV) — ConsultaDatos (prueba, requiere Plan Maestro)
+      if (path === 'consulta_citv') {
+        const placa = (body.placa || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7);
+        if (!placa) return resp({ ok: false, error: 'Placa inválida' }, 400);
+        try {
+          const { ok, status, data, raw } = await consultaCD(`https://api2.consultadatos.com/api/placa/citv/${placa}`);
+          if (ok && data.success && data.data) return resp({ ok: true, ...data.data });
+          if (status === 402 || status === 403) return resp({ ok: false, error: 'Este token no tiene el Plan Maestro habilitado para CITV', http: status }, 402);
+          return resp({ ok: false, error: data.message || 'No se encontró revisión técnica para esta placa', http: status, raw: raw.slice(0,200) }, 404);
+        } catch(e) { return resp({ ok: false, error: 'Error: ' + e.message }, 500); }
+      }
+
+      // ══════════════════════════════════════════════════════════
       //  🔎 RUC EXISTE — verifica si un RUC ya está registrado
       //  Usado en registro.html para evitar duplicados
       // ══════════════════════════════════════════════════════════
