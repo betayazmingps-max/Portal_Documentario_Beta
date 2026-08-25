@@ -282,6 +282,8 @@ Reglas:
         // Usar token del env (secret en Cloudflare) — si el frontend manda uno se ignora
         const apiToken = env.APIS_NET_PE_TOKEN || token || '';
         const authH = apiToken ? { Authorization: 'Bearer ' + apiToken } : {};
+        const apiperuToken = env.APIPERU_DEV_TOKEN || '7028e830e49e91e3fd635f3505062cf9e4429d4906c571c7615d02070884a741';
+        const errores = [];
 
         for (const url of [
           `https://api.apis.net.pe/v2/sunat/ruc?numero=${ruc}`,
@@ -292,13 +294,17 @@ Reglas:
             if (r.ok) {
               const d = await r.json();
               if (d && (d.razonSocial || d.nombre)) return resp(d);
+              errores.push(url+': respuesta sin datos');
+            } else {
+              errores.push(url+': HTTP '+r.status+' '+(await r.text()).slice(0,150));
             }
-          } catch {}
+          } catch(e) { errores.push(url+': '+e.message); }
         }
 
-        // Fallback gratuito
+        // Fallback (apiperu.dev, requiere Bearer token)
         try {
-          const r = await fetch(`https://api.apiperu.dev/api/ruc/${ruc}`);
+          const url = `https://api.apiperu.dev/api/ruc/${ruc}`;
+          const r = await fetch(url, { headers: { Authorization: 'Bearer ' + apiperuToken, Accept: 'application/json' } });
           if (r.ok) {
             const d = await r.json();
             if (d?.data) return resp({
@@ -307,10 +313,13 @@ Reglas:
               condicion:   d.data.condicion_de_domicilio  || '',
               direccion:   d.data.direccion               || '',
             });
+            errores.push(url+': respuesta sin datos');
+          } else {
+            errores.push(url+': HTTP '+r.status+' '+(await r.text()).slice(0,150));
           }
-        } catch {}
+        } catch(e) { errores.push('apiperu.dev: '+e.message); }
 
-        return resp({ error: 'RUC no encontrado en SUNAT' }, 404);
+        return resp({ error: 'RUC no encontrado en SUNAT', detalle: errores }, 404);
       }
 
       // ══════════════════════════════════════════════════════════
@@ -323,6 +332,8 @@ Reglas:
 
         const apiToken = env.APIS_NET_PE_TOKEN || body.token || '';
         const authH = apiToken ? { Authorization: 'Bearer ' + apiToken } : {};
+        const apiperuToken = env.APIPERU_DEV_TOKEN || '7028e830e49e91e3fd635f3505062cf9e4429d4906c571c7615d02070884a741';
+        const errores = [];
 
         for (const url of [
           `https://api.apis.net.pe/v2/reniec/dni?numero=${dni}`,
@@ -333,13 +344,17 @@ Reglas:
             if (r.ok) {
               const d = await r.json();
               if (d && (d.nombres || d.nombre_completo)) return resp(d);
+              errores.push(url+': respuesta sin datos');
+            } else {
+              errores.push(url+': HTTP '+r.status+' '+(await r.text()).slice(0,150));
             }
-          } catch {}
+          } catch(e) { errores.push(url+': '+e.message); }
         }
 
-        // Fallback gratuito
+        // Fallback (apiperu.dev, requiere Bearer token)
         try {
-          const r = await fetch(`https://api.apiperu.dev/api/dni/${dni}`);
+          const url = `https://api.apiperu.dev/api/dni/${dni}`;
+          const r = await fetch(url, { headers: { Authorization: 'Bearer ' + apiperuToken, Accept: 'application/json' } });
           if (r.ok) {
             const d = await r.json();
             if (d?.data) return resp({
@@ -348,10 +363,13 @@ Reglas:
               apellidoMaterno:  d.data.apellido_materno      || '',
               nombre_completo:  d.data.nombre_completo       || '',
             });
+            errores.push(url+': respuesta sin datos');
+          } else {
+            errores.push(url+': HTTP '+r.status+' '+(await r.text()).slice(0,150));
           }
-        } catch {}
+        } catch(e) { errores.push('apiperu.dev: '+e.message); }
 
-        return resp({ error: 'DNI no encontrado en RENIEC' }, 404);
+        return resp({ error: 'DNI no encontrado en RENIEC', detalle: errores }, 404);
       }
 
       // ══════════════════════════════════════════════════════════
