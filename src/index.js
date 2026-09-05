@@ -684,7 +684,7 @@ Reglas:
           proveedor: {
             ruc:                 prov.ruc,
             razonSocial:         prov.razonSocial,
-            carpeta:             prov.carpeta     || '',
+            carpeta:             prov.carpetaSP   || '',
             analista:            prov.analista    || '',
             categoria:           prov.categoria   || '',
             estado:              prov.estado      || 'pendiente',
