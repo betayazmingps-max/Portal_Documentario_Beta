@@ -16,6 +16,13 @@
  *    RESEND_API_KEY      → re_...  (opcional)
  *    EMAIL_FROM          → Portal Beta <noreply@betaagroindustrial.com>
  *    OTP_STORE           → KV Namespace binding
+ *    APIS_NET_PE_TOKEN   → token de api.apis.net.pe (opcional, SUNAT/RENIEC)
+ *    APIPERU_DEV_TOKEN   → token de apiperu.dev (fallback SUNAT/RENIEC)
+ *    CONSULTADATOS_TOKEN → token de consultadatos.com (SOAT/CITV/licencia, plan pagado)
+ *    JSONPE_TOKEN        → token Bearer de json.pe (SOAT/CITV/licencia, https://json.pe/signup)
+ *
+ *  ⚠️ Todos estos tokens deben vivir SOLO como Secrets en Cloudflare.
+ *     Este archivo ya NO trae ningún valor de token por defecto en el código.
  * ════════════════════════════════════════════════════════════════
  */
 
@@ -30,11 +37,11 @@ const FLOWS = {
   crear_carpetas: 'https://default6c6f155728364f3ca89e87e334c217.08.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/0551ca704ec54eeba3e74688050ec1b2/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=U120mc4DgsEBm5HF-k4UbVrMQBru0wLS11tGnID0htk',
 };
 
-const GSHEET_URL = 'https://script.google.com/macros/s/AKfycbw_Fwj-pT-2NBB0w87h0dp2od9vWa4jMglXC773ThwqbrTsf3IRij-tx4amd4_RrF4eKg/exec';
+const GSHEET_URL = 'https://script.google.com/macros/s/AKfycbxJugvYb3C_GA_TQuehnrk0U_G5_ckCbbF5emKWhDmgrVal6tuaQHtx733VNKZzGxSuGQ/exec';
 
 // Modelo de Claude para validación de documentos
 // Haiku 4.5: ~5x más barato que Sonnet, ideal para validar docs estándar (~$12/año vs $60/año en 200 proveedores)
-const MODELO_IA = 'claude-haiku-4-5-20251001';
+const MODELO_IA = 'claude-sonnet-4-6';
 
 const CORS = {
   'Access-Control-Allow-Origin':  '*',
@@ -178,7 +185,7 @@ Reglas:
           method: 'POST', headers: aiHeaders,
           body: JSON.stringify({
             model:    MODELO_IA,
-            max_tokens: modo === 'simple' ? 150 : 300,
+            max_tokens: modo === 'simple' ? 200 : 600,
             system: modo === 'simple' ? SYSTEM_SIMPLE : SYSTEM_COMPLETO,
             messages: [{
               role: 'user',
@@ -282,6 +289,8 @@ Reglas:
         // Usar token del env (secret en Cloudflare) — si el frontend manda uno se ignora
         const apiToken = env.APIS_NET_PE_TOKEN || token || '';
         const authH = apiToken ? { Authorization: 'Bearer ' + apiToken } : {};
+        const apiperuToken = env.APIPERU_DEV_TOKEN || '';
+        const errores = [];
 
         for (const url of [
           `https://api.apis.net.pe/v2/sunat/ruc?numero=${ruc}`,
@@ -292,25 +301,275 @@ Reglas:
             if (r.ok) {
               const d = await r.json();
               if (d && (d.razonSocial || d.nombre)) return resp(d);
+              errores.push(url+': respuesta sin datos');
+            } else {
+              errores.push(url+': HTTP '+r.status+' '+(await r.text()).slice(0,150));
             }
-          } catch {}
+          } catch(e) { errores.push(url+': '+e.message); }
         }
 
-        // Fallback gratuito
-        try {
-          const r = await fetch(`https://api.apiperu.dev/api/ruc/${ruc}`);
-          if (r.ok) {
-            const d = await r.json();
-            if (d?.data) return resp({
-              razonSocial: d.data.nombre_o_razon_social || '',
-              estado:      d.data.estado_del_contribuyente || '',
-              condicion:   d.data.condicion_de_domicilio  || '',
-              direccion:   d.data.direccion               || '',
-            });
-          }
-        } catch {}
+        // Fallback (apiperu.dev, requiere Bearer token)
+        if (!apiperuToken) {
+          errores.push('apiperu.dev: sin token configurado (APIPERU_DEV_TOKEN)');
+        } else {
+          try {
+            const url = `https://api.apiperu.dev/api/ruc/${ruc}`;
+            const r = await fetch(url, { headers: { Authorization: 'Bearer ' + apiperuToken, Accept: 'application/json' } });
+            if (r.ok) {
+              const d = await r.json();
+              if (d?.data) return resp({
+                razonSocial: d.data.nombre_o_razon_social || '',
+                estado:      d.data.estado_del_contribuyente || '',
+                condicion:   d.data.condicion_de_domicilio  || '',
+                direccion:   d.data.direccion               || '',
+              });
+              errores.push(url+': respuesta sin datos');
+            } else {
+              errores.push(url+': HTTP '+r.status+' '+(await r.text()).slice(0,150));
+            }
+          } catch(e) { errores.push('apiperu.dev: '+e.message); }
+        }
 
-        return resp({ error: 'RUC no encontrado en SUNAT' }, 404);
+        return resp({ error: 'RUC no encontrado en SUNAT', detalle: errores }, 404);
+      }
+
+      // ══════════════════════════════════════════════════════════
+      //  🔍 RENIEC DNI — 3 fuentes con fallback automático
+      //  (mismo patrón que sunat_ruc, agregado para Control Documentario)
+      // ══════════════════════════════════════════════════════════
+      if (path === 'sunat_dni') {
+        const dni = (body.dni || '').replace(/\D/g, '').slice(0, 8);
+        if (dni.length !== 8) return resp({ error: 'DNI inválido' }, 400);
+
+        const apiToken = env.APIS_NET_PE_TOKEN || body.token || '';
+        const authH = apiToken ? { Authorization: 'Bearer ' + apiToken } : {};
+        const apiperuToken = env.APIPERU_DEV_TOKEN || '';
+        const errores = [];
+
+        for (const url of [
+          `https://api.apis.net.pe/v2/reniec/dni?numero=${dni}`,
+          `https://api.apis.net.pe/v1/dni?numero=${dni}`,
+        ]) {
+          try {
+            const r = await fetch(url, { headers: authH });
+            if (r.ok) {
+              const d = await r.json();
+              if (d && (d.nombres || d.nombre_completo)) return resp(d);
+              errores.push(url+': respuesta sin datos');
+            } else {
+              errores.push(url+': HTTP '+r.status+' '+(await r.text()).slice(0,150));
+            }
+          } catch(e) { errores.push(url+': '+e.message); }
+        }
+
+        // Fallback (apiperu.dev, requiere Bearer token)
+        if (!apiperuToken) {
+          errores.push('apiperu.dev: sin token configurado (APIPERU_DEV_TOKEN)');
+        } else {
+          try {
+            const url = `https://api.apiperu.dev/api/dni/${dni}`;
+            const r = await fetch(url, { headers: { Authorization: 'Bearer ' + apiperuToken, Accept: 'application/json' } });
+            if (r.ok) {
+              const d = await r.json();
+              if (d?.data) return resp({
+                nombres:          d.data.nombres              || '',
+                apellidoPaterno:  d.data.apellido_paterno      || '',
+                apellidoMaterno:  d.data.apellido_materno      || '',
+                nombre_completo:  d.data.nombre_completo       || '',
+              });
+              errores.push(url+': respuesta sin datos');
+            } else {
+              errores.push(url+': HTTP '+r.status+' '+(await r.text()).slice(0,150));
+            }
+          } catch(e) { errores.push('apiperu.dev: '+e.message); }
+        }
+
+        return resp({ error: 'DNI no encontrado en RENIEC', detalle: errores }, 404);
+      }
+
+      // ══════════════════════════════════════════════════════════
+      //  🏢 CONSULTADATOS.COM — fuente principal para DNI/RUC/Licencia/SOAT (Plan Standard + Maestro, pagado)
+      //  Token: env.CONSULTADATOS_TOKEN (Cloudflare Secret)
+      // ══════════════════════════════════════════════════════════
+      const CD_TOKEN = env.CONSULTADATOS_TOKEN || '';
+
+      async function consultaCD(url) {
+        if (!CD_TOKEN) return { ok: false, status: 500, data: { message: 'CONSULTADATOS_TOKEN no configurado en el Worker' }, raw: '' };
+        const r = await fetch(url, { headers: { Authorization: 'Bearer ' + CD_TOKEN, Accept: 'application/json' } });
+        const text = await r.text();
+        let d = {};
+        try { d = JSON.parse(text); } catch {}
+        return { ok: r.ok, status: r.status, data: d, raw: text };
+      }
+
+      // 🆔 DNI — ConsultaDatos
+      if (path === 'consulta_dni_cd') {
+        const dni = (body.dni || '').replace(/\D/g, '').slice(0, 8);
+        if (dni.length !== 8) return resp({ ok: false, error: 'DNI inválido' }, 400);
+        try {
+          const { ok, status, data, raw } = await consultaCD(`https://api2.consultadatos.com/api/dni/${dni}`);
+          if (ok && data.NOMBRES) return resp({ ok: true, ...data });
+          if (status === 402 || status === 403) return resp({ ok: false, error: 'Créditos agotados o plan insuficiente', http: status }, 402);
+          return resp({ ok: false, error: data.message || 'DNI no encontrado', http: status, raw: raw.slice(0,200) }, 404);
+        } catch(e) { return resp({ ok: false, error: 'Error: ' + e.message }, 500); }
+      }
+
+      // 🏢 RUC — ConsultaDatos
+      if (path === 'consulta_ruc_cd') {
+        const ruc = (body.ruc || '').replace(/\D/g, '').slice(0, 11);
+        if (ruc.length !== 11) return resp({ ok: false, error: 'RUC inválido' }, 400);
+        try {
+          const { ok, status, data, raw } = await consultaCD(`https://api2.consultadatos.com/api/ruc/${ruc}`);
+          if (ok && data.success && data.data) return resp({ ok: true, ...data.data });
+          if (status === 402 || status === 403) return resp({ ok: false, error: 'Créditos agotados o plan insuficiente', http: status }, 402);
+          return resp({ ok: false, error: data.message || 'RUC no encontrado', http: status, raw: raw.slice(0,200) }, 404);
+        } catch(e) { return resp({ ok: false, error: 'Error: ' + e.message }, 500); }
+      }
+
+      // 🪪 LICENCIA DE CONDUCIR — ConsultaDatos (por DNI)
+      if (path === 'consulta_licencia') {
+        const dni = (body.dni || '').replace(/\D/g, '').slice(0, 8);
+        if (dni.length !== 8) return resp({ ok: false, error: 'DNI inválido' }, 400);
+        try {
+          const { ok, status, data, raw } = await consultaCD(`https://api2.consultadatos.com/api/licencia/${dni}`);
+          if (ok && data.success && data.data) return resp({ ok: true, ...data.data });
+          if (status === 402 || status === 403) return resp({ ok: false, error: 'Créditos agotados o plan insuficiente', http: status }, 402);
+          return resp({ ok: false, error: data.message || 'Licencia no encontrada', http: status, raw: raw.slice(0,200) }, 404);
+        } catch(e) { return resp({ ok: false, error: 'Error: ' + e.message }, 500); }
+      }
+
+      // 🛡️ SOAT — ConsultaDatos (por placa)
+      if (path === 'consulta_soat') {
+        const placa = (body.placa || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7);
+        if (!placa) return resp({ ok: false, error: 'Placa inválida' }, 400);
+        try {
+          const { ok, status, data, raw } = await consultaCD(`https://api2.consultadatos.com/api/placa/soat/${placa}`);
+          if (ok && data.data) return resp({ ok: true, ...data.data });
+          if (status === 402 || status === 403) return resp({ ok: false, error: 'Créditos agotados o plan insuficiente', http: status }, 402);
+          return resp({ ok: false, error: data.message || 'SOAT no encontrado', http: status, raw: raw.slice(0,200) }, 404);
+        } catch(e) { return resp({ ok: false, error: 'Error: ' + e.message }, 500); }
+      }
+
+      // 🚗 REVISIÓN TÉCNICA (CITV) — ConsultaDatos (requiere Plan Maestro; fuente principal para CITV es json.pe, ver abajo)
+      if (path === 'consulta_citv') {
+        const placa = (body.placa || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7);
+        if (!placa) return resp({ ok: false, error: 'Placa inválida' }, 400);
+        try {
+          const { ok, status, data, raw } = await consultaCD(`https://api2.consultadatos.com/api/placa/citv/${placa}`);
+          if (ok && data.success && data.data) return resp({ ok: true, ...data.data });
+          if (status === 402 || status === 403) return resp({ ok: false, error: 'Este token no tiene el Plan Maestro habilitado para CITV', http: status }, 402);
+          return resp({ ok: false, error: data.message || 'No se encontró revisión técnica para esta placa', http: status, raw: raw.slice(0,200) }, 404);
+        } catch(e) { return resp({ ok: false, error: 'Error: ' + e.message }, 500); }
+      }
+
+      // ══════════════════════════════════════════════════════════
+      //  🚗 REVISIÓN TÉCNICA (CITV) — json.pe (fuente principal, plan pagado)
+      //  Devuelve el HISTORIAL completo de inspecciones (array), no solo la última.
+      //  Token: env.JSONPE_TOKEN (Bearer) — cuenta en https://json.pe/signup
+      // ══════════════════════════════════════════════════════════
+      if (path === 'consulta_citv_json') {
+        const placa = (body.placa || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7);
+        if (!placa) return resp({ ok: false, error: 'Placa inválida' }, 400);
+
+        const jsonpeToken = env.JSONPE_TOKEN || '';
+        if (!jsonpeToken) return resp({ ok: false, error: 'JSONPE_TOKEN no configurado en el Worker' }, 500);
+
+        try {
+          const r = await fetch('https://api.json.pe/api/revision-tecnica', {
+            method:  'POST',
+            headers: {
+              'Content-Type':  'application/json',
+              'Authorization': 'Bearer ' + jsonpeToken,
+            },
+            body: JSON.stringify({ placa }),
+          });
+          const text = await r.text();
+          let d = {};
+          try { d = JSON.parse(text); } catch {}
+
+          if (r.ok && d.success && Array.isArray(d.data) && d.data.length) {
+            // Se devuelve tal cual el formato de json.pe: {success, message, data:[...]}
+            // porque así es como ya lo interpreta el frontend (busca data.find(x=>x.orden==='ULTIMO')).
+            return resp({ success: true, message: d.message || 'exito', data: d.data });
+          }
+          if (r.status === 401 || r.status === 403) {
+            return resp({ ok: false, error: 'Token de json.pe inválido o sin créditos', http: r.status }, 402);
+          }
+          return resp({ ok: false, error: (d.message || 'No se encontró revisión técnica para esta placa'), http: r.status, raw: text.slice(0,200) }, 404);
+        } catch(e) { return resp({ ok: false, error: 'Error: ' + e.message }, 500); }
+      }
+
+      // ══════════════════════════════════════════════════════════
+      //  🪪 LICENCIA DE CONDUCIR — json.pe (por DNI)
+      //  Ya no se usa desde el panel (el frontend usa consulta_licencia de ConsultaDatos);
+      //  se deja disponible como ruta de respaldo.
+      //  La documentación pública de json.pe no confirma la ruta exacta,
+      //  así que se prueban las variantes más probables en orden.
+      //  Token: env.JSONPE_TOKEN (Bearer)
+      // ══════════════════════════════════════════════════════════
+      if (path === 'consulta_licencia_json') {
+        const dni = (body.dni || '').replace(/\D/g, '').slice(0, 8);
+        if (dni.length !== 8) return resp({ ok: false, error: 'DNI inválido' }, 400);
+
+        const jsonpeToken = env.JSONPE_TOKEN || '';
+        if (!jsonpeToken) return resp({ ok: false, error: 'JSONPE_TOKEN no configurado en el Worker' }, 500);
+
+        const candidatos = [
+          'https://api.json.pe/api/licencia',
+          'https://api.json.pe/api/licencia-conducir',
+          'https://api.json.pe/api/dni/licencia',
+        ];
+        const errores = [];
+        for (const url of candidatos) {
+          try {
+            const r = await fetch(url, {
+              method:  'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jsonpeToken },
+              body: JSON.stringify({ dni }),
+            });
+            const text = await r.text();
+            let d = {};
+            try { d = JSON.parse(text); } catch {}
+            if (r.status === 404 && /no encontrad|not found/i.test(text)) { errores.push(url+': ruta no existe'); continue; }
+            if (r.ok && d.success) return resp(d); // se pasa tal cual — el frontend ya sabe leer data.licencia / data
+            if (r.status === 401 || r.status === 403) return resp({ ok: false, error: 'Token de json.pe inválido o sin créditos', http: r.status }, 402);
+            errores.push(url+': HTTP '+r.status+' '+text.slice(0,120));
+          } catch(e) { errores.push(url+': '+e.message); }
+        }
+        return resp({ ok: false, error: 'No se encontró licencia para ese DNI', detalle: errores }, 404);
+      }
+
+      // ══════════════════════════════════════════════════════════
+      //  👥 RUC — REPRESENTANTE LEGAL — json.pe
+      //  Ya no se usa desde el panel (el frontend usa consulta_ruc_cd de ConsultaDatos,
+      //  que ya trae representantes); se deja disponible como ruta de respaldo.
+      //  Confirmado en la doc oficial: POST /ruc/representantes {ruc}
+      //  Token: env.JSONPE_TOKEN (Bearer)
+      // ══════════════════════════════════════════════════════════
+      if (path === 'consulta_representante_json') {
+        const ruc = (body.ruc || '').replace(/\D/g, '').slice(0, 11);
+        if (ruc.length !== 11) return resp({ ok: false, error: 'RUC inválido' }, 400);
+
+        const jsonpeToken = env.JSONPE_TOKEN || '';
+        if (!jsonpeToken) return resp({ ok: false, error: 'JSONPE_TOKEN no configurado en el Worker' }, 500);
+
+        try {
+          const r = await fetch('https://api.json.pe/api/ruc/representantes', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jsonpeToken },
+            body: JSON.stringify({ ruc }),
+          });
+          const text = await r.text();
+          let d = {};
+          try { d = JSON.parse(text); } catch {}
+
+          if (r.ok && d.success) {
+            // {success, message, data:[{tipo_de_documento, numero_de_documento, nombre, cargo, fecha_desde}]}
+            return resp({ success: true, message: d.message || 'exito', data: Array.isArray(d.data) ? d.data : [] });
+          }
+          if (r.status === 401 || r.status === 403) return resp({ ok: false, error: 'Token de json.pe inválido o sin créditos', http: r.status }, 402);
+          return resp({ ok: false, error: (d.message || 'No se encontró representante para ese RUC'), http: r.status, raw: text.slice(0,200) }, 404);
+        } catch(e) { return resp({ ok: false, error: 'Error: ' + e.message }, 500); }
       }
 
       // ══════════════════════════════════════════════════════════
