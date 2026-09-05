@@ -833,37 +833,62 @@ Reglas:
         const flowUrl = FLOWS.subir_solicitud;
         if (!flowUrl) return resp({ ok: false, error: 'Flow SubirSolicitud no configurado' }, 500);
 
-        // Fire-and-forget: respondemos inmediato, el Flow sigue en segundo plano
-        const promesa = fetch(flowUrl, {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    rawBody,
-        }).catch(e => console.warn('subir_solicitud error:', e.message));
-
-        ctx.waitUntil(promesa);
-        return resp({ ok: true });
+        // Ya no es fire-and-forget: mismo problema que subir_docs/crear_carpetas —
+        // si no se espera y revisa la respuesta, un fallo del Flow queda invisible.
+        let ultimoError = '';
+        for (let i = 1; i <= 3; i++) {
+          try {
+            const r = await fetchConTimeout(flowUrl, {
+              method:  'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body:    rawBody,
+            }, 45000);
+            const text = await r.text();
+            let errorEnBody = null;
+            try { const d = JSON.parse(text); errorEnBody = d?.error?.code || d?.error?.message || (d?.error ? JSON.stringify(d.error) : null); } catch {}
+            if (!errorEnBody && (r.status === 202 || r.ok)) return resp({ ok: true });
+            ultimoError = errorEnBody || ('HTTP ' + r.status);
+          } catch(e) {
+            ultimoError = e.message;
+          }
+          if (i < 3) await sleep(2000 * i);
+        }
+        return resp({ ok: false, error: 'No se pudo enviar la solicitud: ' + ultimoError }, 500);
       }
 
       // ══════════════════════════════════════════════════════════
       //  📤 SUBIR DOCS
-      //  MEJORA: Responde inmediato al usuario (fire-and-forget)
-      //  El Flow sigue ejecutándose en segundo plano
+      //  Antes era fire-and-forget: respondía "ok" sin esperar al Flow, así que si el
+      //  Flow fallaba (ej. TriggerInputSchemaMismatch) el usuario veía "éxito" pero el
+      //  archivo nunca llegaba a SharePoint. Ahora sí espera la respuesta real y la revisa,
+      //  con 3 reintentos — igual que crear_carpetas.
       // ══════════════════════════════════════════════════════════
       if (path === 'subir_docs') {
         const flowUrl = FLOWS.subir_docs;
+        let ultimoError = '';
 
-        // Disparar el Flow sin esperar respuesta (no bloquea al usuario)
-        const promesaFlow = fetch(flowUrl, {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    rawBody,
-        }).catch(e => console.warn('subir_docs Flow error:', e.message));
+        for (let i = 1; i <= 3; i++) {
+          try {
+            const r = await fetchConTimeout(flowUrl, {
+              method:  'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body:    rawBody,
+            }, 45000);
 
-        // waitUntil permite que el Flow siga corriendo aunque ya respondamos
-        ctx.waitUntil(promesaFlow);
+            const text = await r.text();
+            let errorEnBody = null;
+            try { const d = JSON.parse(text); errorEnBody = d?.error?.code || d?.error?.message || (d?.error ? JSON.stringify(d.error) : null); } catch {}
 
-        // Responder inmediatamente al frontend
-        return resp({ ok: true, mensaje: 'Documentos enviados a SharePoint' });
+            if (!errorEnBody && (r.status === 202 || r.ok)) {
+              return resp({ ok: true, mensaje: 'Documentos enviados a SharePoint' });
+            }
+            ultimoError = errorEnBody || ('HTTP ' + r.status);
+          } catch(e) {
+            ultimoError = e.message;
+          }
+          if (i < 3) await sleep(2000 * i);
+        }
+        return resp({ ok: false, error: 'No se pudo subir el documento a SharePoint: ' + ultimoError }, 500);
       }
 
       // ══════════════════════════════════════════════════════════
