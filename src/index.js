@@ -880,6 +880,17 @@ Reglas:
               headers: { 'Content-Type': 'application/json' },
               body:    JSON.stringify(payload),
             }, 30000);
+            // Power Automate a veces responde 200 con un error adentro del body
+            // (ej. TriggerInputSchemaMismatch) en vez de un código de error HTTP —
+            // sin este chequeo, ese caso se reportaba como éxito sin haber creado nada.
+            const text = await r.text();
+            let errorEnBody = null;
+            try { const d = JSON.parse(text); errorEnBody = d?.error?.code || d?.error?.message || (d?.error ? JSON.stringify(d.error) : null); } catch {}
+            if (errorEnBody) {
+              if (i === 3) return resp({ ok: false, error: 'Power Automate: ' + errorEnBody }, 500);
+              await sleep(2000 * i);
+              continue;
+            }
             if (r.status === 202 || r.ok) return resp({ ok: true });
             if (i < 3) await sleep(2000 * i);
           } catch(e) {
