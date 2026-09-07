@@ -500,6 +500,42 @@ Reglas:
       }
 
       // ══════════════════════════════════════════════════════════
+      //  🚚 DATOS DEL VEHÍCULO (marca/modelo/color/motor/vin) — json.pe
+      //  Endpoint distinto a revision-tecnica: ese solo da datos de la
+      //  inspección CITV, este da los datos propios del vehículo.
+      //  Token: env.JSONPE_TOKEN (Bearer)
+      // ══════════════════════════════════════════════════════════
+      if (path === 'consulta_placa_json') {
+        const placa = (body.placa || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7);
+        if (!placa) return resp({ ok: false, error: 'Placa inválida' }, 400);
+
+        const jsonpeToken = env.JSONPE_TOKEN || '';
+        if (!jsonpeToken) return resp({ ok: false, error: 'JSONPE_TOKEN no configurado en el Worker' }, 500);
+
+        try {
+          const r = await fetch('https://api.json.pe/api/placa', {
+            method:  'POST',
+            headers: {
+              'Content-Type':  'application/json',
+              'Authorization': 'Bearer ' + jsonpeToken,
+            },
+            body: JSON.stringify({ placa }),
+          });
+          const text = await r.text();
+          let d = {};
+          try { d = JSON.parse(text); } catch {}
+
+          if (r.ok && d.success && d.data) {
+            return resp({ success: true, message: d.message || 'exito', data: d.data });
+          }
+          if (r.status === 401 || r.status === 403) {
+            return resp({ ok: false, error: 'Token de json.pe inválido o sin créditos', http: r.status }, 402);
+          }
+          return resp({ ok: false, error: (d.message || 'No se encontró información del vehículo para esta placa'), http: r.status, raw: text.slice(0,200) }, 404);
+        } catch(e) { return resp({ ok: false, error: 'Error: ' + e.message }, 500); }
+      }
+
+      // ══════════════════════════════════════════════════════════
       //  🪪 LICENCIA DE CONDUCIR — json.pe (por DNI)
       //  Ya no se usa desde el panel (el frontend usa consulta_licencia de ConsultaDatos);
       //  se deja disponible como ruta de respaldo.
