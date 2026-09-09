@@ -137,6 +137,17 @@ Responde SOLO con JSON puro (sin markdown, sin texto extra):
   }
 }
 
+CONTRATOS — vigencia por duración (NO solo fecha explícita):
+Muchos contratos no dicen una fecha de vencimiento directa, sino una duración
+("vigencia de 12 meses", "por el plazo de 1 año", "renovable anualmente", etc.)
+contada desde la fecha de firma/inicio. En esos casos:
+1. Identifica la fecha de firma/inicio del contrato → va en "emision"
+2. Identifica la duración mencionada (en meses o años)
+3. CALCULA vencimiento = emision + esa duración, y ponlo en "vencimiento" en formato YYYY-MM-DD
+   (ej: firma 2026-03-01 + "vigencia de 12 meses" → vencimiento "2027-03-01")
+- Si el contrato SÍ trae una fecha de vencimiento explícita, úsala tal cual (no la recalcules)
+- Si no hay ninguna fecha de inicio NI duración mencionada, deja vencimiento en null (no inventes)
+
 Reglas:
 - valido=true si corresponde al campo (acepta variantes razonables)
 - nitido=false SOLO si está MUY borroso, oscuro o cortado (las fotos siempre son nitido=true si se distingue lo principal)
