@@ -791,7 +791,12 @@ Reglas:
               body:    rawBody,
             }, 15000);
             let data;
-            try { data = await r.json(); } catch { data = { ok: true }; }
+            // OJO: si Apps Script devuelve un error (ej. HTML de "supera el máximo de
+            // caracteres por celda"), la respuesta NO es JSON válido. Antes esto se
+            // interpretaba como éxito ({ok:true}) y el fallo quedaba invisible tanto
+            // para el analista como para el proveedor. Ahora se reporta como error real.
+            try { data = await r.json(); }
+            catch { data = { ok: false, error: 'Google Sheets no devolvió una respuesta válida (posible error del script o límite de tamaño excedido)' }; }
             return resp(data);
           } catch(e) {
             ultimoError = e.message;
@@ -799,6 +804,24 @@ Reglas:
           }
         }
         return resp({ ok: false, error: 'Google Sheets no respondió después de 3 intentos: ' + ultimoError }, 500);
+      }
+
+      // ══════════════════════════════════════════════════════════
+      //  📄 VER UN DOCUMENTO PUNTUAL (contenido bajo demanda)
+      //  Proveedores!Docs ya no guarda el base64, solo metadata — el
+      //  contenido real vive en la hoja "Documentos" y se pide acá
+      //  solo cuando el analista hace clic en "Ver documento".
+      // ══════════════════════════════════════════════════════════
+      if (path === 'ver_doc') {
+        const { ruc, docId } = body;
+        if (!ruc || !docId) return resp({ ok: false, error: 'ruc y docId requeridos' }, 400);
+
+        const sheetUrl = GSHEET_URL + '?action=verDoc&ruc=' + encodeURIComponent(ruc) + '&docId=' + encodeURIComponent(docId);
+        const res      = await fetch(sheetUrl, { redirect: 'follow' });
+        let data;
+        try { data = await res.json(); }
+        catch { data = { ok: false, error: 'Google Sheets no devolvió una respuesta válida' }; }
+        return resp(data);
       }
 
       // ══════════════════════════════════════════════════════════
