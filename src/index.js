@@ -432,6 +432,14 @@ Reglas:
         try {
           const { ok, status, data, raw } = await consultaCD(`https://api2.consultadatos.com/api/ruc/${ruc}`);
           if (ok && data.success && data.data) return resp({ ok: true, ...data.data });
+
+          // ConsultaDatos falló (plan/crédito/caída de su lado) — respaldo con
+          // apis.net.pe + apiperu.dev para no dejar el buscador de RUC sin datos.
+          // Trae menos campos (sin representantes/trabajadores/histórico), pero
+          // sí razón social, estado y condición, que es lo que usa el formulario.
+          const respaldo = await rucRespaldo_(ruc, env);
+          if (respaldo) return resp({ ok: true, ...respaldo, _fuente: 'respaldo' });
+
           if (status === 402 || status === 403) return resp({ ok: false, error: 'Créditos agotados o plan insuficiente', http: status }, 402);
           return resp({ ok: false, error: data.message || 'RUC no encontrado', http: status, raw: raw.slice(0,200) }, 404);
         } catch(e) { return resp({ ok: false, error: 'Error: ' + e.message }, 500); }
@@ -1016,6 +1024,54 @@ Reglas:
 };
 
 // ── Helpers ──────────────────────────────────────────────────────
+
+// Respaldo de RUC cuando ConsultaDatos falla (plan/créditos/caída de su lado).
+// Intenta apis.net.pe (v2, v1) y luego apiperu.dev, en ese orden, y devuelve
+// los datos con los mismos nombres de campo que usa ConsultaDatos
+// (razon_social, estado, condicion, domicilio_fiscal) para que el frontend
+// no tenga que cambiar nada. Devuelve null si ninguna fuente responde.
+async function rucRespaldo_(ruc, env) {
+  const apiToken     = env.APIS_NET_PE_TOKEN || '';
+  const apiperuToken = env.APIPERU_DEV_TOKEN || '';
+  const authH = apiToken ? { Authorization: 'Bearer ' + apiToken } : {};
+
+  for (const url of [
+    `https://api.apis.net.pe/v2/sunat/ruc?numero=${ruc}`,
+    `https://api.apis.net.pe/v1/ruc?numero=${ruc}`,
+  ]) {
+    try {
+      const r = await fetch(url, { headers: authH });
+      if (r.ok) {
+        const d = await r.json();
+        const razonSocial = d.razonSocial || d.nombre;
+        if (razonSocial) return {
+          razon_social:     razonSocial,
+          estado:           d.estado    || '',
+          condicion:        d.condicion || '',
+          domicilio_fiscal: d.direccion || '',
+        };
+      }
+    } catch {}
+  }
+
+  if (apiperuToken) {
+    try {
+      const url = `https://api.apiperu.dev/api/ruc/${ruc}`;
+      const r = await fetch(url, { headers: { Authorization: 'Bearer ' + apiperuToken, Accept: 'application/json' } });
+      if (r.ok) {
+        const d = await r.json();
+        if (d?.data) return {
+          razon_social:     d.data.nombre_o_razon_social    || '',
+          estado:           d.data.estado_del_contribuyente || '',
+          condicion:        d.data.condicion_de_domicilio   || '',
+          domicilio_fiscal: d.data.direccion                || '',
+        };
+      }
+    } catch {}
+  }
+
+  return null;
+}
 
 function resp(data, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: CORS });
