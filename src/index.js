@@ -216,6 +216,67 @@ Reglas:
       }
 
       // ══════════════════════════════════════════════════════════
+      //  🧾 ANALIZAR GUÍA DE REMISIÓN con Claude (foto o PDF)
+      //  Para Control de Acceso: el Conductor fotografía la guía y de ahí
+      //  salen N° de guía, peso, jabas y hora de carga. Ruta aparte de
+      //  /analizar_doc (que valida documentos de proveedores) para no
+      //  mezclar los prompts.
+      // ══════════════════════════════════════════════════════════
+      if (path === 'analizar_guia') {
+        const { mediaType, isImg, data: b64 } = body;
+        const apiKey = env.ANTHROPIC_API_KEY;
+        if (!apiKey) return resp({ ok: false, error: 'ANTHROPIC_API_KEY no configurado' }, 500);
+        if (!b64 || !mediaType) return resp({ ok: false, error: 'Faltan datos del archivo' }, 400);
+
+        const SYSTEM_GUIA = `Eres un lector de guías de remisión peruanas (remitente o transportista) para Complejo Agroindustrial Beta. Transporte de materia prima y jabas vacías.
+
+Recibirás la foto o PDF de UNA guía. Extrae SOLO lo que se ve claramente. Si un dato no aparece o no se lee, pon null — NO inventes.
+
+Responde SOLO con JSON puro (sin markdown, sin texto extra):
+{
+  "valida": true/false,          // ¿realmente es una guía de remisión?
+  "nitida": true/false,          // false solo si está muy borrosa/cortada para leerla
+  "numero": "serie-correlativo, ej. T001-000123, o null",
+  "ruc_emisor": "RUC de quien emite la guía (11 dígitos) o null",
+  "fecha_guia": "YYYY-MM-DD (fecha de emisión) o null",
+  "hora_carga": "HH:MM en 24 horas (hora de inicio de traslado / de carga si aparece) o null",
+  "peso": "peso total tal como aparece, con su unidad, ej. 1250 KGM o 1.25 TNE, o null",
+  "jabas": "cantidad de jabas/unidades total, solo el número, o null",
+  "placa": "placa del vehículo o null",
+  "origen": "punto de partida o null",
+  "destino": "punto de llegada o null",
+  "observacion": "algo relevante que ayude a entender la guía, o null"
+}
+
+Reglas:
+- "jabas" es la cantidad de jabas/cajas/unidades del ítem principal (o la suma si hay varios de jabas).
+- Números con coma decimal peruana: respeta el valor tal cual aparece.
+- Si hay varias horas, la de carga/inicio de traslado va en hora_carga.`;
+
+        const parteArchivo = isImg
+          ? { type: 'image',    source: { type: 'base64', media_type: mediaType, data: b64 } }
+          : { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } };
+
+        const r = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type':      'application/json',
+            'x-api-key':         apiKey,
+            'anthropic-version': '2023-06-01',
+          },
+          body: JSON.stringify({
+            model: MODELO_IA,
+            max_tokens: 600,
+            system: SYSTEM_GUIA,
+            messages: [{ role: 'user', content: [parteArchivo, { type: 'text', text: 'Lee esta guía.' }] }],
+          }),
+        });
+        if (!r.ok) return resp({ ok: false, error: 'Claude error: ' + await r.text() }, 500);
+        const d = await r.json();
+        return resp({ ok: true, texto: d.content?.find(c => c.type === 'text')?.text || '{}' });
+      }
+
+      // ══════════════════════════════════════════════════════════
       //  📧 ENVIAR OTP
       //  MEJORA: Rate limiting — máx 3 OTPs por email cada 10 min
       // ══════════════════════════════════════════════════════════
